@@ -1,0 +1,43 @@
+{
+  "name": "autofrp",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "run-p type-check \"build-only {@}\" --",
+    "preview": "vite preview",
+    "dev:vue": "vite build -w -c vite.config.web.ts --mode development --outDir ./.dev_web",
+    "dev:node": "vite build -w -c vite.config.node.ts --mode development --outDir ./.dev_node",
+    "dev:run": "node --watch ./.dev_node/server.js",
+    "build:all": "vue-tsc && vite build -c vite.config.node.ts --outDir build_node && vite build -c vite.config.web.ts --outDir build_web",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --build --force"
+  },
+  "dependencies": {
+    "@shockpkg/archive-files": "^3.2.3",
+    "cors": "^2.8.5",
+    "download-github-release": "^0.3.2",
+    "express": "5.0.0-beta.2",
+    "express-fileupload": "^1.5.0",
+    "mime": "^4.0.1",
+    "vite-plugin-node": "^3.1.0",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@tsconfig/node20": "^20.1.2",
+    "@types/cors": "^2.8.17",
+    "@types/mime": "^3.0.4",
+    "@types/node": "^20.11.28",
+    "@types/tar": "^6.1.11",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vitejs/plugin-vue-jsx": "^3.1.0",
+    "@vue/tsconfig": "^0.5.1",
+    "npm-run-all2": "^6.1.2",
+    "tar": "^6.2.1",
+    "typescript": "~5.4.0",
+    "vite": "^5.1.6",
+    "vue-tsc": "^2.0.6"
+  }
+}
