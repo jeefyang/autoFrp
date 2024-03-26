@@ -54,7 +54,7 @@ async function frpInit() {
     console.log("开始解压压缩包")
     const a = new ArchiveTarGz(path.join(frp_dir, filename))
     await a.read(async (entry) => {
-        // console.log(entry.path)
+        console.log(path.basename(entry.path))
         await entry.extract(path.join(frp_dir, 'extract', path.basename(entry.path)))
     })
     console.log('解压压缩包成功')
@@ -71,7 +71,7 @@ export default defineConfig(async ({ mode }) => {
         plugins: [
             ...VitePluginNode({
                 adapter: 'express',
-                appPath: './server/server.ts',
+                appPath: './src/server/server.ts',
             }),
         ]
     }

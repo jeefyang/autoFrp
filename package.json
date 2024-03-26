@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "dev:vue": "vite build -w -c vite.config.web.ts --mode development --outDir ./.dev_web",
     "dev:node": "vite build -w -c vite.config.node.ts --mode development --outDir ./.dev_node",
-    "dev:run": "node --watch ./.dev_node/server.js",
+    "dev:run": "node ./.dev_node/server.js",
+    "dev:watch:run": "nodemon --watch ./.dev_node/server.js --exec \"npm run dev:run\"",
     "build:all": "vue-tsc && vite build -c vite.config.node.ts --outDir build_node && vite build -c vite.config.web.ts --outDir build_web",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force"
@@ -28,6 +29,7 @@
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
     "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
     "@types/mime": "^3.0.4",
     "@types/node": "^20.11.28",
     "@types/tar": "^6.1.11",
