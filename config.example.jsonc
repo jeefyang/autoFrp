@@ -1,3 +1,4 @@
 {
-    "listen": 3009
+    "listen": 3009,
+    "backupFile":".frp/backup.json"
 }

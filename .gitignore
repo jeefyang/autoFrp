@@ -35,3 +35,4 @@ build_node
 build_web
 frp
 config.jsonc
+*.mjs

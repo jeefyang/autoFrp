@@ -3,7 +3,7 @@ import cors from "cors"
 import mime from "mime"
 import fs from "fs"
 import path from "path"
-import { type ConfigType } from "./type.d"
+import { type ConfigType,type BackupDataType } from "./type.d"
 
 
 const app = express()
@@ -27,7 +27,78 @@ console.log(`环境为:${import.meta.env.MODE}`)
 //     return
 // })
 
-const vue_Router_list: string[] = ["/", "/about", "/home"]
+const vue_Router_list: string[] = ["/", "/list", "/home"]
+
+app.get("/store",async (req,res)=>{
+    if(!fs.existsSync(configjson.backupFile)){
+        res.send("")
+        return
+    }
+    let s=fs.readFileSync(configjson.backupFile,"utf-8")
+    if(!s){
+        res.send("")
+        return
+    }
+    let j:BackupDataType=JSON.parse(s)
+    if(!j.store){
+        res.send("")
+        return
+    }
+    res.send(JSON.stringify(j.store))
+})
+
+app.get("/proxyListStore",async (req,res)=>{
+    if(!fs.existsSync(configjson.backupFile)){
+        res.send("")
+        return
+    }
+    let s=fs.readFileSync(configjson.backupFile,"utf-8")
+    if(!s){
+        res.send("")
+        return
+    }
+    let j:BackupDataType=JSON.parse(s)
+    if(!j.proxyListStore){
+        res.send("")
+        return
+    }
+    res.send(JSON.stringify(j.proxyListStore))
+})
+
+app.post("/saveStore",async(req,res)=>{
+    
+    let d:BackupDataType={}
+    if(!fs.existsSync(configjson.backupFile)){
+        let dir=path.dirname(configjson.backupFile)
+        if(!fs.existsSync(dir)){
+            fs.mkdirSync(dir)
+        }
+    }
+    else{
+        let s=fs.readFileSync(configjson.backupFile,"utf-8")
+        d=JSON.parse(s)
+    }
+    d.store=req.body
+    fs.writeFileSync(configjson.backupFile,JSON.stringify(d),"utf-8")
+    res.send("saveStore success!!!")
+})
+
+app.post("/saveProxyListStore",async (req,res)=>{
+    let d:BackupDataType={}
+    if(!fs.existsSync(configjson.backupFile)){
+        let dir=path.dirname(configjson.backupFile)
+        if(!fs.existsSync(dir)){
+            fs.mkdirSync(dir)
+        }
+    }
+    else{
+        let s=fs.readFileSync(configjson.backupFile,"utf-8")
+        d=JSON.parse(s)
+    }
+    d.proxyListStore=req.body
+    fs.writeFileSync(configjson.backupFile,JSON.stringify(d),"utf-8")
+    res.send("saveProxyListStore success!!!")
+})
 
 app.get(/\/*/, async (req, res, next) => {
     let p = req.path
