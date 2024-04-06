@@ -27,7 +27,7 @@ console.log(`环境为:${import.meta.env.MODE}`)
 //     return
 // })
 
-const vue_Router_list: string[] = ["/", "/list", "/home"]
+const vue_Router_list: string[] = ["/", "/list", "/other","/home"]
 
 app.get("/store",async (req,res)=>{
     if(!fs.existsSync(configjson.backupFile)){

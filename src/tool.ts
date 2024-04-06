@@ -1,3 +1,4 @@
+import { proxyStore } from "./proxyStore"
 import {type ProxyStoreType} from "./proxyStore.type.d"
 import {store } from "./store"
 import {type StoreType} from './store.type.d'
@@ -11,8 +12,7 @@ export function createProxyStore(){
         useCompression:true,
         bandwidthLimit:"",
         bandwidthLimitMode:"client",
-        enableProxyProtocol:false,
-        proxyProtocolVersion:"v1",
+        proxyProtocolVersion:"none",
         enableHttpVerify:false,
         httpUser:"",
         httpPassword:"",
@@ -29,7 +29,11 @@ export function createProxyStore(){
         https2httpKeypath:store.keyUrl,
         https2httpHostHeaderRewrite:"127.0.0.1",
         enableHostHeaderRewrite:false,
-        hostHeaderRewrite:""
+        hostHeaderRewrite:"",
+        stcpSecretKey:"",
+        stcpAllowUsers:"*",
+        xtcpSecretKey:"",
+        xtcpAllowUsers:"*"
     }
     return d
 }
@@ -38,8 +42,17 @@ export function objectAssign<T>(o:T):T{
     return Object.assign({},o) 
 }
 
+export function jsonClone<T>(o:T):T{
+        return JSON.parse(JSON.stringify(o))
+}
+
 export function saveStore(){
     return objectAssign(store)
+}
+
+export function saveProxyStore(){
+    
+       return proxyStore.map(c=>{console.log(c);return objectAssign(c)})
 }
 
 export function loadStore(o:StoreType){
@@ -49,6 +62,23 @@ export function loadStore(o:StoreType){
             //@ts-ignore
            store[key]= o[key]
         }
+    }
+}
+
+export function loadProxyStore(o:ProxyStoreType[]){
+    
+    proxyStore.splice(0,proxyStore.length)
+    for(let i=0;i<o.length;i++){
+        let c=o[i]
+        let temp=createProxyStore()
+        for(let key in temp){
+             //@ts-ignore
+            if(c[key]!=undefined){
+                 //@ts-ignore
+                temp[key]=c[key]
+            }
+        }
+        proxyStore.push(temp)
     }
 }
 

@@ -2,12 +2,25 @@
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
 import { ref, onMounted } from "vue"
+import { mainStorage } from "./mainStorage"
+import { proxyStore } from './proxyStore';
+import { otherStore } from "./otherStore"
+import { store } from './store';
+
 
 const active = ref(0)
 
 onMounted(() => {
-
+  mainStorage.loadProxyStoreByLocalStorage()
+  console.log(proxyStore)
 })
+
+const onUpdateListView = () => {
+  setTimeout(() => {
+    otherStore.proxyListUpdate += 1;
+    
+  }, 10);
+}
 
 </script>
 
@@ -30,8 +43,8 @@ onMounted(() => {
   <van-config-provider theme="dark">
     <van-tabbar v-model="active" :route="true" :placeholder="true" :safe-area-inset-bottom="true">
       <van-tabbar-item icon="home-o" to="/">主信息</van-tabbar-item>
-      <van-tabbar-item icon="bars" to="/list">代理列表</van-tabbar-item>
-      <van-tabbar-item icon="friends-o">其他</van-tabbar-item>
+      <van-tabbar-item icon="bars" to="/list" @click="onUpdateListView">代理列表</van-tabbar-item>
+      <van-tabbar-item icon=" friends-o" to="/other">其他</van-tabbar-item>
     </van-tabbar>
     <div class="boxtest">
       <RouterView />

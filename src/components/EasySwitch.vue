@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, defineModel, defineProps, defineEmits } from "vue"
-const isPassword = ref(true)
 const model = defineModel<boolean>({ required: true })
 defineProps<{
     label: string

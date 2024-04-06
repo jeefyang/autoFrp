@@ -1,15 +1,128 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, watch, onMounted, } from "vue"
 import PopupProxyList from "@/components/PopupProxyList.vue"
-import { createProxyStore } from "@/tool"
+import { createProxyStore, objectAssign } from "@/tool"
+import type { ProxyStoreType } from "@/proxyStore.type";
+import { proxyStore } from "@/proxyStore"
+import { mainStorage } from '@/mainStorage'
+import { showToast, showConfirmDialog } from "vant";
+import { store } from "@/store";
+import { otherStore } from "@/otherStore";
+
 
 const showEdit = ref(false)
-const proxySite = ref(<number>-1)
+const proxySite = ref(<number>-2)
 const proxyData = ref(createProxyStore())
+let backupProxyData!: ProxyStoreType
+
+const redColor = "#ee0a24"
+const greenColor = "#07c160"
+const orangeColor = "#ff976a"
+const blueColor = "#1989fa"
+
+const size = "20px"
+const fontSize = "15px"
+onMounted(() => {
+    watch([() => otherStore.proxyListUpdate], () => {
+        // console.log("hhh")
+        mainStorage.reloadProxyStore()
+    })
+})
+
 
 const setShow = () => {
     showEdit.value = true
-    console.log("hello")
+}
+
+const onAddProxy = () => {
+    proxyData.value = createProxyStore()
+    proxySite.value = -1
+    backupProxyData = objectAssign(proxyData.value)
+    showEdit.value = true
+}
+
+const onEditProxy = (i: number) => {
+    proxyData.value = objectAssign(proxyStore[i])
+    proxySite.value = i
+    backupProxyData = objectAssign(proxyData.value)
+    showEdit.value = true
+}
+
+const getProxyDomain = (i: number) => {
+    let c = proxyStore[i]
+    if (c.type == "http") {
+        if (c.subdomain) {
+            return `http://${c.subdomain}.${store.serverAddr}:${store.vhostHTTPPort}`
+        }
+        return `http://${c.customDomains.split(" ")[0]}:${store.vhostHTTPPort}`
+    }
+    else if (c.type == "https") {
+        if (c.subdomain) {
+            return `https://${c.subdomain}.${store.serverAddr}:${store.vhostHTTPSPort}`
+        }
+        return `http://${c.customDomains.split(" ")[0]}:${store.vhostHTTPPort}`
+    }
+    return `${store.serverAddr}:${c.remotePort}`
+}
+
+const onEditProxyEnable = (i: number) => {
+    proxyStore[i].enable = !proxyStore[i].enable
+    showToast(`代理 ${proxyStore[i].name} 当前状态:${proxyStore[i].enable}`)
+}
+
+const onEditProxyEncryption = (i: number) => {
+    proxyStore[i].useEncryption = !proxyStore[i].useEncryption
+    showToast(`代理 ${proxyStore[i].name} 当前加密状态:${proxyStore[i].useEncryption}`)
+}
+
+const onEditProxyCompression = (i: number) => {
+    proxyStore[i].useCompression = !proxyStore[i].useCompression
+    showToast(`代理 ${proxyStore[i].name} 当前压缩状态:${proxyStore[i].useCompression}`)
+}
+
+const onDeleteProxy = (i: number) => {
+    showConfirmDialog({
+        title: `删除代理 ${proxyStore[i].name}`,
+        message:
+            '确定要删除代理吗?',
+    })
+        .then(() => {
+            proxyStore.splice(i, 1)
+            // on confirm
+        })
+        .catch(() => {
+            // on cancel
+        });
+}
+
+const onjumpProxy = (i: number) => {
+    console.log("跳转")
+}
+
+const onconfirmChild = () => {
+    if (proxySite.value == -1) {
+        proxyStore.push(objectAssign(proxyData.value))
+    }
+    else if (proxySite.value >= 0) {
+        proxyStore[proxySite.value] = objectAssign(proxyData.value)
+    }
+    proxySite.value = -2
+    showEdit.value = false
+    console.log(proxyStore)
+}
+
+
+const onresetChild = () => {
+    proxyData.value = objectAssign(backupProxyData)
+}
+
+const onsave = () => {
+    mainStorage.saveProxyStoreByLocalStorage()
+    showToast("已经保存到localstorage")
+}
+
+const onClear = () => {
+    mainStorage.clearProxyStoreByLocalStorage()
 }
 
 </script>
@@ -19,22 +132,77 @@ const setShow = () => {
 
         <div class="content">
             <div class="display">
+                <template v-for="(child, index) in  proxyStore">
+                    <div class="pos">
+                        <van-cell-group :style="{ 'width': '100%' }">
+                            <div class="row rowbig">
+                                <div class="row posleft">
+                                    <van-icon :name="child.enable ? 'play-circle' : 'stop-circle'"
+                                        @click="onEditProxyEnable(index)"
+                                        :class="child.enable ? 'enableLight' : 'disableLight'" :size="size"></van-icon>
+                                </div>
+                                <div class="row poscenter">
+                                    <div :style="{ 'color': blueColor, 'font-size': fontSize }">{{ child.name }}
+                                    </div>
+                                    <div :style="{ 'color': orangeColor, 'font-size': fontSize }">{{ child.localIP }}
+                                    </div>
+                                    <div :style="{ 'font-size': fontSize }">:</div>
+                                    <div :style="{ 'color': blueColor, 'font-size': fontSize }">{{ child.remotePort }}
+                                    </div>
+                                    <div :style="{ 'color': orangeColor, 'font-size': fontSize }">{{ child.type }}</div>
+                                </div>
 
+                                <div class="row posright">
+                                    <div>
+                                        <van-button class="btn" type="primary"
+                                            @click="onEditProxy(index)">修改</van-button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row rowbig">
+                                <div class="row posleft">
+                                    <van-icon name="arrow" :class="child.enable ? 'enableLight' : 'disableLight'"
+                                        :size="size" @click="onjumpProxy(index)"></van-icon>
+                                </div>
+                                <div class="row poscenter">
+                                    <div :style="{ 'color': blueColor, 'font-size': fontSize }">{{
+                    getProxyDomain(index) }}</div>
+                                    <div :style="{ 'color': child.useEncryption ? greenColor : redColor, 'font-size': fontSize }"
+                                        @click="onEditProxyEncryption(index)">
+                                        加密
+                                    </div>
+                                    <div :style="{ 'color': child.useCompression ? greenColor : redColor, 'font-size': fontSize }"
+                                        @click="onEditProxyCompression(index)">
+                                        压缩
+                                    </div>
+                                </div>
+                                <div class="row posright">
+                                    <div>
+                                        <van-button class="btn" type="danger"
+                                            @click="onDeleteProxy(index)">删除</van-button>
+                                    </div>
+                                </div>
+                            </div>
+                        </van-cell-group>
+                    </div>
+
+                </template>
             </div>
 
         </div>
         <div class="buttomDiv">
             <div class="pos">
-                <van-button class="btn" type="primary" @click="setShow">添加</van-button>
-                <van-button class="btn" type="primary">应用</van-button>
-                <van-button class="btn" type="primary">保存</van-button>
-                <van-button class="btn" type="primary">重置</van-button>
-                <van-button class="btn" type="primary">云端</van-button>
-                <van-button class="btn" type="primary">初始化</van-button>
+                <van-button class="btn" type="primary" @click="onAddProxy">添加代理</van-button>
+                <van-button class="btn" type="primary">应用更新</van-button>
+                <van-button class="btn" type="primary" @click="onsave">保存本地</van-button>
+                <!-- <van-button class="btn" type="primary">重置当前</van-button>
+                <van-button class="btn" type="primary">读取云端</van-button>
+                <van-button class="btn" type="primary">清空本地</van-button> -->
             </div>
         </div>
     </div>
-    <PopupProxyList v-model:show="showEdit" :data="proxyData"></PopupProxyList>
+    <PopupProxyList v-model:show="showEdit" :data="proxyData" @onreset="onresetChild" @onconfirm="onconfirmChild">
+    </PopupProxyList>
 </template>
 <style scoped>
 .big {
@@ -64,6 +232,19 @@ const setShow = () => {
 
 .pos {
     display: flex;
+    flex-direction: row;
+}
+
+.posleft {
+    width: 5%;
+}
+
+.poscenter {
+    width: 80%
+}
+
+.posright {
+    width: 15%;
 }
 
 .buttomDiv {
@@ -72,5 +253,24 @@ const setShow = () => {
     width: 100%;
 
 
+}
+
+.enableLight {
+    color: #07c160;
+}
+
+.disableLight {
+    color: #ee0a24
+}
+
+.rowbig {
+    width: 100%
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
 }
 </style>

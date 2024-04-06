@@ -3,7 +3,7 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
-import {Switch ,Popup,Picker, Button, Tabbar, TabbarItem, ConfigProvider,Grid, GridItem,Icon,Field, CellGroup  } from 'vant';
+import {Switch,Popup,Picker, Button, Tabbar, TabbarItem, ConfigProvider,Grid, GridItem,Icon,Field, CellGroup,Dialog   } from 'vant';
 import 'vant/lib/index.css';
 
 const app = createApp(App)
@@ -21,5 +21,6 @@ app.use(CellGroup);
 app.use(Popup)
 app.use(Picker)
 app.use(Switch)
+app.use(Dialog)
 app.use(router)
 app.mount('#app')

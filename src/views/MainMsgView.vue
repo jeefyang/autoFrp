@@ -135,11 +135,8 @@ const alertFunc = (s: string, e?: MouseEvent,) => {
         </div>
         <div class="buttomDiv">
             <div class="pos">
-                <van-button class="btn" type="primary">应用</van-button>
-                <van-button class="btn" type="primary">保存</van-button>
-                <van-button class="btn" type="primary">重置</van-button>
-                <van-button class="btn" type="primary">云端</van-button>
-                <van-button class="btn" type="primary">初始化</van-button>
+                <van-button class="btn" type="primary">应用更新</van-button>
+                <van-button class="btn" type="primary">保存本地</van-button>
             </div>
         </div>
     </div>
