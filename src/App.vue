@@ -6,19 +6,23 @@ import { mainStorage } from "./mainStorage"
 import { proxyStore } from './proxyStore';
 import { otherStore } from "./otherStore"
 import { store } from './store';
-
+import { type ConfigType } from "@/server/type.d"
 
 const active = ref(0)
 
-onMounted(() => {
+onMounted(async () => {
+  let config: ConfigType = await fetch('/config').then(s => s.json())
+  store.crtUrl = config.crtUrl || store.crtUrl
+  store.keyUrl = config.keyUrl || store.keyUrl
+  mainStorage.loadStoreByLocalStorage()
   mainStorage.loadProxyStoreByLocalStorage()
-  console.log(proxyStore)
+
 })
 
 const onUpdateListView = () => {
   setTimeout(() => {
     otherStore.proxyListUpdate += 1;
-    
+
   }, 10);
 }
 

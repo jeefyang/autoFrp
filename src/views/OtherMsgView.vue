@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
 
-import { showToast } from "vant";
+import { showToast, showConfirmDialog } from "vant";
 import { mainStorage } from "@/mainStorage"
 
 const onStoreReset = () => {
@@ -31,6 +31,7 @@ const onProxyStoreReset = () => {
 
 const onProxyStorageClear = () => {
     mainStorage.clearProxyStoreByLocalStorage()
+    showConfirmDialog({title:"是否刷新?"})
     showToast("已经清空localstorage的代理列表")
 }
 

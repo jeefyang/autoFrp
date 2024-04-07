@@ -1,3 +1,4 @@
 export type OtherStoreType={
-    proxyListUpdate:number
+    proxyListUpdate:number,
+    loadingMsg:string
 }

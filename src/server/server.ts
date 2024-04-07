@@ -3,10 +3,14 @@ import cors from "cors"
 import mime from "mime"
 import fs from "fs"
 import path from "path"
+import bodyparser from "body-parser"
 import { type ConfigType,type BackupDataType } from "./type.d"
+import {execSync} from "child_process"
 
 
 const app = express()
+app.use(bodyparser.json({limit:'lmb'}))
+app.use(bodyparser.urlencoded({extended:true}))
 // app.use(cors())
 const jsonUrl = "./config.jsonc"
 const exampleJsonUrl = "./config.example.jsonc"
@@ -29,6 +33,24 @@ console.log(`环境为:${import.meta.env.MODE}`)
 
 const vue_Router_list: string[] = ["/", "/list", "/other","/home"]
 
+app.get("/status",async(req,res)=>{
+       let out= execSync(`pm2 ls |grep ${configjson.frpcPM2Name}`,{cwd:"./frp",encoding:"utf-8"})
+       let status="undefined"
+        if(out){
+            if(out.indexOf("online")==-1){
+                status='online'
+            }
+            else{
+                status='offline'
+            }
+        }
+        res.send(JSON.stringify({status}))
+})
+
+app.get("/config",async(req,res)=>{
+        res.send(JSON.stringify(configjson))
+})
+
 app.get("/store",async (req,res)=>{
     if(!fs.existsSync(configjson.backupFile)){
         res.send("")
@@ -45,6 +67,7 @@ app.get("/store",async (req,res)=>{
         return
     }
     res.send(JSON.stringify(j.store))
+    return
 })
 
 app.get("/proxyListStore",async (req,res)=>{
@@ -65,8 +88,7 @@ app.get("/proxyListStore",async (req,res)=>{
     res.send(JSON.stringify(j.proxyListStore))
 })
 
-app.post("/saveStore",async(req,res)=>{
-    
+const saveStoreFunc=(o:any)=>{
     let d:BackupDataType={}
     if(!fs.existsSync(configjson.backupFile)){
         let dir=path.dirname(configjson.backupFile)
@@ -78,12 +100,77 @@ app.post("/saveStore",async(req,res)=>{
         let s=fs.readFileSync(configjson.backupFile,"utf-8")
         d=JSON.parse(s)
     }
-    d.store=req.body
+    d.store=o
     fs.writeFileSync(configjson.backupFile,JSON.stringify(d),"utf-8")
+}
+
+app.post("/saveStore",async(req,res)=>{
+    saveStoreFunc(req.body)
     res.send("saveStore success!!!")
+    return
 })
 
-app.post("/saveProxyListStore",async (req,res)=>{
+app.post("/applyStore",async(req,res)=>{
+    saveStoreFunc(req.body)
+    res.send("saveStore success!!!")
+    return
+})
+
+app.post('/loadCrtFile',async(req,res)=>{
+    let url=configjson.crtUrl
+    if(req.body && req.body.url){
+        url=req.body.url
+    }
+    if(!fs.existsSync(url)){
+        res.send("")
+        return
+    }
+    let s=fs.readFileSync(url,'utf8')
+    res.send(s)
+    return
+})
+
+app.post("/saveCrtFile",async(req,res)=>{
+    let url=req?.body?.url||configjson.crtUrl
+    if(!fs.existsSync(url)){
+        let dir=path.dirname(url)
+        if(!fs.existsSync(dir)){
+            fs.mkdirSync(dir)
+        }
+    }
+    fs.writeFileSync(url,req?.body?.content)
+    res.send("crtfile save success!!!!")
+    return
+})
+
+app.post('/loadKeyFile',async(req,res)=>{
+    let url=configjson.keyUrl
+    if(req.body && req.body.url){
+        url=req.body.url
+    }
+    if(!fs.existsSync(url)){
+        res.send("")
+        return
+    }
+    let s=fs.readFileSync(url,'utf8')
+    res.send(s)
+    return
+})
+
+app.post("/saveKeyFile",async(req,res)=>{
+    let url=req?.body?.url||configjson.keyUrl
+    if(!fs.existsSync(url)){
+        let dir=path.dirname(url)
+        if(!fs.existsSync(dir)){
+            fs.mkdirSync(dir)
+        }
+    }
+    fs.writeFileSync(url,req?.body?.content)
+    res.send("keyfile save success!!!!")
+    return
+})
+
+const saveProxyListStoreFunc=(o:any)=>{
     let d:BackupDataType={}
     if(!fs.existsSync(configjson.backupFile)){
         let dir=path.dirname(configjson.backupFile)
@@ -95,9 +182,21 @@ app.post("/saveProxyListStore",async (req,res)=>{
         let s=fs.readFileSync(configjson.backupFile,"utf-8")
         d=JSON.parse(s)
     }
-    d.proxyListStore=req.body
+    d.proxyListStore=o
     fs.writeFileSync(configjson.backupFile,JSON.stringify(d),"utf-8")
+}
+
+app.post("/saveProxyListStore",async (req,res)=>{
+    saveProxyListStoreFunc(req.body)
     res.send("saveProxyListStore success!!!")
+    return 
+})
+
+app.post("/applyProxyListStore",async (req,res)=>{
+    console.log(123,req.body)
+    saveProxyListStoreFunc(req.body)
+    res.send("saveProxyListStore success!!!")
+    return 
 })
 
 app.get(/\/*/, async (req, res, next) => {

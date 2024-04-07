@@ -1,18 +1,18 @@
 {
-    "app": [
+    "app":[
         {
-            "name": "autoFrp_node",
-            "script": "./build_node/server.js",
+            "name": "autoFrp_frpc",
+            "script": "./extract/frpc -c ./frpc.jeef.toml",
             "merge_logs": false,
             "restart_delay": 7200000,
             "log_date_format": "YYYY-MM-DD HH:mm:ss",
-            "out_file": "./autoFrp_node.log",
+            "out_file": "./frpc.log",
             "watch_options": {
                 "followSymlinks": false
             },
             "watch_delay": "3000",
             "watch": [
-                "build_node"
+                "./frpc.jeef.toml"
             ],
             "ignore_watch": []
         }

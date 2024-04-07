@@ -45,10 +45,10 @@ export type StoreType = {
     vhostHTTPPort: number
     /** crt证书内容 */
     crtContent:string
-    /** crt证书路径 */
+    /** crt证书路径,初始化会首先去读取配置文件的路径 */
     crtUrl:string
     /** key密钥内容 */
     keyContent:string
-    /** key密钥路径 */
+    /** key密钥路径,初始化会首先去读取配置文件的路径 */
     keyUrl:string
 }

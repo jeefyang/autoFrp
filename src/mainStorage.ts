@@ -2,6 +2,7 @@ import {saveStore,loadStore, saveProxyStore, loadProxyStore, objectAssign} from 
 import {type StoreType } from "./store.type.d"
 import {type ProxyStoreType } from "./proxyStore.type.d"
 import { proxyStore } from "./proxyStore"
+import { store } from "./store"
 
 class MainStorage{
     storeStorageKey="store"
@@ -86,16 +87,118 @@ class MainStorage{
                 "Content-Type":"application/json"
             }
         })
+        let t=await req.text()
+        if(t.indexOf("success")!=-1){
+            return true
+        }
+        return false
+    }
+
+    async applyStoreByCloud(){
+        let req=await fetch("/applyStore",{
+            method:"post",
+            body:JSON.stringify(saveStore()),
+            headers:{
+                "Content-Type":"application/json"
+            }
+        })
+        let t=await req.text()
+        if(t.indexOf("success")!=-1){
+            return true
+        }
+        return false
     }
 
     async saveProxyStoreByCloud(){
-        let req=await fetch("/saveProxyStore",{
+        let req=await fetch("/saveProxyListStore",{
             method:"post",
             body:JSON.stringify(saveProxyStore()),
             headers:{
                 "Content-Type":"application/json"
             }
         })
+        let t=await req.text()
+        if(t.indexOf("success")!=-1){
+            return true
+        }
+        return false
+    }
+
+    async applyProxyStoreByCloud(){
+        let req=await fetch("/applyProxyListStore",{
+            method:"post",
+            body:JSON.stringify(saveProxyStore()),
+            headers:{
+                "Content-Type":"application/json"
+            }
+        })
+        let t=await req.text()
+        if(t.indexOf("success")!=-1){
+            return true
+        }
+        return false
+    }
+
+    async loadCrtFileByCloud(){
+        let req=await fetch('/loadCrtFile',{
+            method:"post",
+            body:JSON.stringify({url:store.crtUrl}),
+            headers:{
+                "Content-Type":"application/json"
+            }
+        })
+        let s=await req.text()
+        if(!s){
+            return false
+        }
+        store.crtContent=s      
+        return true  
+    }
+
+    async saveCrtFileByCloud(){
+        let req=await fetch("/saveCrtFile",{
+            method:'post',
+            body:JSON.stringify({url:store.crtUrl,content:store.crtContent}),
+            headers:{
+                "Content-Type":"application/json"
+            }
+        })
+        let s=await req.text()
+        if(s.indexOf("success")!=-1){
+            return true
+        }
+        return false
+    }
+
+    async loadKeyFileByCloud(){
+        let req=await fetch('/loadKeyFile',{
+            method:"post",
+            body:JSON.stringify({url:store.keyUrl}),
+            headers:{
+                "Content-Type":"application/json"
+            }
+        })
+        let s=await req.text()
+        if(!s){
+            return false
+        }
+        store.keyContent=s      
+        return true  
+    }
+
+    async saveKeyFileByCloud(){
+        let req=await fetch("/saveKeyFile",{
+            method:'post',
+            body:JSON.stringify({url:store.keyUrl,content:store.keyContent}),
+            headers:{
+                "Content-Type":"application/json"
+            }
+        })
+        let s=await req.text()
+        if(s.indexOf("success")!=-1){
+            return true
+        }
+        return false
     }
 
 }

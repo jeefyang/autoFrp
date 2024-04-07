@@ -1,4 +1,7 @@
 {
     "listen": 3009,
-    "backupFile":".frp/backup.json"
+    "backupFile":".frp/backup.json",
+    "crtUrl":"./server.crt",
+    "keyUrl":"./server.key",
+    "frpcPM2Name":"autoFrp_frpc"
 }

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, } from "vue"
 import PopupProxyList from "@/components/PopupProxyList.vue"
-import { createProxyStore, objectAssign } from "@/tool"
+import { createProxyStore, objectAssign, copyStr } from "@/tool"
 import type { ProxyStoreType } from "@/proxyStore.type";
 import { proxyStore } from "@/proxyStore"
 import { mainStorage } from '@/mainStorage'
-import { showToast, showConfirmDialog } from "vant";
+import { showToast, showConfirmDialog, showLoadingToast, showFailToast } from "vant";
 import { store } from "@/store";
 import { otherStore } from "@/otherStore";
 
@@ -13,6 +13,7 @@ import { otherStore } from "@/otherStore";
 const showEdit = ref(false)
 const proxySite = ref(<number>-2)
 const proxyData = ref(createProxyStore())
+const searchKey = ref(<string>"")
 let backupProxyData!: ProxyStoreType
 
 const redColor = "#ee0a24"
@@ -29,6 +30,35 @@ onMounted(() => {
     })
 })
 
+const checkSearchKey = (index: number, key: string) => {
+    if (!key) {
+        return true
+    }
+    if (key == "") {
+        return true
+    }
+    let c = proxyStore[index]
+    if (c.name.indexOf(key) != -1) {
+        return true
+    }
+    if (c.localIP.indexOf(key) != -1) {
+        return true
+    }
+    if (c.localPort.toString().indexOf(key) != -1) {
+        return true
+    }
+    if ((c.type != "http" && c.type != 'https') && c.remotePort.toString().indexOf(key) != -1) {
+        return true
+    }
+    if ((c.type == 'http' || c.type == "https") && c.subdomain && c.subdomain.indexOf(key) != -1) {
+        return true
+    }
+    if ((c.type == 'http' || c.type == "https") && !c.subdomain && c.customDomains.indexOf(key) != -1) {
+        return true
+    }
+
+    return false
+}
 
 const setShow = () => {
     showEdit.value = true
@@ -95,8 +125,26 @@ const onDeleteProxy = (i: number) => {
         });
 }
 
+const onCopyProxyUrl = (i: number) => {
+    let url = getProxyDomain(i)
+    let status = copyStr(url)
+    if (status) {
+        showToast(`复制 ${url} 到剪切板`)
+        return
+    }
+    showToast(`无法复制 ${url} 到剪切板`)
+
+}
+
 const onjumpProxy = (i: number) => {
-    console.log("跳转")
+    // console.log("跳转")
+    showToast(`即将跳转 ${getProxyDomain(i)}`)
+    try {
+        window.open(getProxyDomain(i))
+    }
+    catch {
+        showFailToast({ message: `无法跳转到 ${getProxyDomain(i)}` })
+    }
 }
 
 const onconfirmChild = () => {
@@ -111,7 +159,6 @@ const onconfirmChild = () => {
     console.log(proxyStore)
 }
 
-
 const onresetChild = () => {
     proxyData.value = objectAssign(backupProxyData)
 }
@@ -121,8 +168,27 @@ const onsave = () => {
     showToast("已经保存到localstorage")
 }
 
-const onClear = () => {
-    mainStorage.clearProxyStoreByLocalStorage()
+const onApplyUpdate = async () => {
+    showConfirmDialog({
+        title: `应用更新`,
+        message:
+            '确定要更新代理数据到服务器并执行新代理吗?',
+    })
+        .then(async () => {
+            let loading = showLoadingToast({ message: "应用更新中", overlay: true, forbidClick: true, duration: 0 })
+            let status = await mainStorage.applyProxyStoreByCloud()
+            loading.close()
+            if (status) {
+                showToast("应用更新成功")
+                return
+            }
+            showToast("应用更新失败!!!")
+
+        })
+        .catch(() => {
+            // on cancel
+        });
+
 }
 
 </script>
@@ -132,8 +198,12 @@ const onClear = () => {
 
         <div class="content">
             <div class="display">
+                <van-cell-group inset>
+                    <!-- 输入任意文本 -->
+                    <van-field v-model="searchKey" label="搜索" />
+                </van-cell-group>
                 <template v-for="(child, index) in  proxyStore">
-                    <div class="pos">
+                    <div class="pos" v-if="checkSearchKey(index, searchKey)">
                         <van-cell-group :style="{ 'width': '100%' }">
                             <div class="row rowbig">
                                 <div class="row posleft">
@@ -165,8 +235,9 @@ const onClear = () => {
                                         :size="size" @click="onjumpProxy(index)"></van-icon>
                                 </div>
                                 <div class="row poscenter">
-                                    <div :style="{ 'color': blueColor, 'font-size': fontSize }">{{
-                    getProxyDomain(index) }}</div>
+                                    <div :style="{ 'color': blueColor, 'font-size': fontSize }"
+                                        @click="onCopyProxyUrl(index)">{{
+                        getProxyDomain(index) }}</div>
                                     <div :style="{ 'color': child.useEncryption ? greenColor : redColor, 'font-size': fontSize }"
                                         @click="onEditProxyEncryption(index)">
                                         加密
@@ -193,7 +264,7 @@ const onClear = () => {
         <div class="buttomDiv">
             <div class="pos">
                 <van-button class="btn" type="primary" @click="onAddProxy">添加代理</van-button>
-                <van-button class="btn" type="primary">应用更新</van-button>
+                <van-button class="btn" type="primary" @click="onApplyUpdate">应用更新</van-button>
                 <van-button class="btn" type="primary" @click="onsave">保存本地</van-button>
                 <!-- <van-button class="btn" type="primary">重置当前</van-button>
                 <van-button class="btn" type="primary">读取云端</van-button>

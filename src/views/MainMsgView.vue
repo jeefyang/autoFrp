@@ -1,11 +1,12 @@
 <script setup lang="ts">
 // import { } from "vue"
 import { store } from "../store"
-import { showToast } from 'vant';
+import { showToast, showLoadingToast, showConfirmDialog } from 'vant';
 import { ref } from "vue"
 import EasyPicker from "@/components/EasyPicker.vue"
 import EasyPW from "@/components/EasyPW.vue"
 import EasySwitch from "@/components/EasySwitch.vue"
+import { mainStorage } from "@/mainStorage";
 
 const desc = {
     serverAddr: "ServerAddr 指定要连接到的服务器的地址。",
@@ -25,9 +26,9 @@ const desc = {
     logdisablePrintColor: "当DisableLogColor设置为true且LogWay=='console'时禁用日志颜色",
     loginFailExit: "LoginFailExit 控制客户端在尝试登录失败后是否应退出。如果为 false，客户端将重试，直到登录成功。默认情况下，此值为 true。",
     crtContent: "crt证书内容,保存更新将覆写文件",
-    crtUrl: "crt证书路径,将用于内容写入文件里,且代理时默认同步crt证书路径",
+    crtUrl: "crt证书路径,将用于内容写入文件里,且代理时默认同步crt证书路径,指的当前客户端所在服务器的路径,如不清楚客户端所在服务器的路径,请不要乱修改",
     keyContent: "key密钥内容,保存更新将覆写文件",
-    keyUrl: "key密钥路径,将用于内容写入文件里,且代理时默认同步key密钥路径",
+    keyUrl: "key密钥路径,将用于内容写入文件里,且代理时默认同步key密钥路径,指的当前客户端所在服务器的路径,如不清楚客户端所在服务器的路径,请不要乱修改",
 
 
 }
@@ -51,6 +52,78 @@ const alertFunc = (s: string, e?: MouseEvent,) => {
     })
 }
 
+const onApply = () => {
+    showConfirmDialog({
+        title: `应用更新`,
+        message:
+            '确定要更新主数据到服务器并执行新的主数据吗?',
+    })
+        .then(async () => {
+            let loading = showLoadingToast({ message: "应用更新中", overlay: true, forbidClick: true, duration: 0 })
+            let status = await mainStorage.applyStoreByCloud()
+            loading.close()
+            if (status) {
+                showToast("应用更新成功")
+                return
+            }
+            showToast("应用更新失败!!!")
+
+        })
+        .catch(() => {
+            // on cancel
+        });
+}
+
+const onSave = () => {
+    mainStorage.saveStoreByLocalStorage()
+    showToast("已经保存到localstorage")
+}
+
+const onLoadCrtFile = async () => {
+    let status = await mainStorage.loadCrtFileByCloud()
+    if (!status) {
+        showToast("没有读取到crt证书内容")
+        return
+    }
+    showToast("读取到crt证书内容并更新显示")
+    status = await mainStorage.loadKeyFileByCloud()
+    if (!status) {
+        showToast("没有读取到key密钥内容")
+        return
+    }
+    showToast("读取到key密钥内容并更新显示")
+}
+
+const onSaveCrtFile = async () => {
+    showConfirmDialog({
+        title: `云端保存证书`,
+        message:
+            '确定要更新证书数据到云端?',
+    })
+        .then(async () => {
+            let loading = showLoadingToast({ message: "应用更新中", overlay: true, forbidClick: true, duration: 0 })
+            let status = await mainStorage.saveCrtFileByCloud()
+            if (!status) {
+                loading.close()
+                showToast("无法保存crt证书到云端")
+                return
+            }
+            showToast("成功保存crt证书到云端")
+            status = await mainStorage.saveKeyFileByCloud()
+            if (!status) {
+                loading.close()
+                showToast("无法保存key密钥到云端")
+                return
+            }
+            loading.close()
+            showToast("成功保存key密钥到云端")
+
+        })
+        .catch(() => {
+            // on cancel
+        });
+
+}
 
 </script>
 <template>
@@ -59,7 +132,6 @@ const alertFunc = (s: string, e?: MouseEvent,) => {
         <div class="content">
             <div class="display">
                 <van-cell-group inset>
-
                     <van-field autosize type="textarea" @click="alertFunc(desc.serverAddr, $event)" rows="1"
                         right-icon="warning-o" v-model="store.serverAddr" label="服务器地址:" placeholder="请输入服务器地址" />
 
@@ -125,8 +197,8 @@ const alertFunc = (s: string, e?: MouseEvent,) => {
                     <van-field autosize type="text" @click="alertFunc(desc.keyUrl, $event)" rows="1"
                         v-model="store.keyUrl" label="key密钥路径:" placeholder="请输入key密钥路径" />
                     <div>
-                        <van-button class="btn" type="default">云端读取证书</van-button>
-                        <van-button class="btn" type="default">云端保存证书</van-button>
+                        <van-button class="btn" type="default" @click="onLoadCrtFile">云端读取证书</van-button>
+                        <van-button class="btn" type="default" @click="onSaveCrtFile">云端保存证书</van-button>
                     </div>
 
                 </van-cell-group>
@@ -135,8 +207,8 @@ const alertFunc = (s: string, e?: MouseEvent,) => {
         </div>
         <div class="buttomDiv">
             <div class="pos">
-                <van-button class="btn" type="primary">应用更新</van-button>
-                <van-button class="btn" type="primary">保存本地</van-button>
+                <van-button class="btn" type="primary" @click="onApply">应用更新</van-button>
+                <van-button class="btn" type="primary" @click="onSave">保存本地</van-button>
             </div>
         </div>
     </div>
