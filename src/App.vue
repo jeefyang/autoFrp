@@ -22,7 +22,12 @@ onMounted(async () => {
 const onUpdateListView = () => {
   setTimeout(() => {
     otherStore.proxyListUpdate += 1;
+  }, 10);
+}
 
+const onUpdateOtherView = () => {
+  setTimeout(() => {
+    otherStore.otherUpdate += 1;
   }, 10);
 }
 
@@ -48,7 +53,7 @@ const onUpdateListView = () => {
     <van-tabbar v-model="active" :route="true" :placeholder="true" :safe-area-inset-bottom="true">
       <van-tabbar-item icon="home-o" to="/">主信息</van-tabbar-item>
       <van-tabbar-item icon="bars" to="/list" @click="onUpdateListView">代理列表</van-tabbar-item>
-      <van-tabbar-item icon=" friends-o" to="/other">其他</van-tabbar-item>
+      <van-tabbar-item icon="friends-o" to="/other">其他</van-tabbar-item>
     </van-tabbar>
     <div class="boxtest">
       <RouterView />

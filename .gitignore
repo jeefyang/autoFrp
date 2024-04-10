@@ -36,3 +36,5 @@ build_web
 frp
 config.jsonc
 *.mjs
+
+test*

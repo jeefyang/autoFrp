@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, watch, onMounted, } from "vue"
+import { ref, watch, onMounted, onActivated } from "vue"
 import PopupProxyList from "@/components/PopupProxyList.vue"
-import { createProxyStore, objectAssign, copyStr } from "@/tool"
+import { createProxyStore, objectAssign } from "@/tool"
 import type { ProxyStoreType } from "@/proxyStore.type";
 import { proxyStore } from "@/proxyStore"
 import { mainStorage } from '@/mainStorage'
@@ -29,6 +29,7 @@ onMounted(() => {
         mainStorage.reloadProxyStore()
     })
 })
+
 
 const checkSearchKey = (index: number, key: string) => {
     if (!key) {
@@ -127,12 +128,9 @@ const onDeleteProxy = (i: number) => {
 
 const onCopyProxyUrl = (i: number) => {
     let url = getProxyDomain(i)
-    let status = copyStr(url)
-    if (status) {
+    navigator.clipboard.writeText(url).then(() => {
         showToast(`复制 ${url} 到剪切板`)
-        return
-    }
-    showToast(`无法复制 ${url} 到剪切板`)
+    })
 
 }
 
@@ -200,7 +198,7 @@ const onApplyUpdate = async () => {
             <div class="display">
                 <van-cell-group inset>
                     <!-- 输入任意文本 -->
-                    <van-field v-model="searchKey" label="搜索" />
+                    <van-field v-model="searchKey" label="搜索:" placeholder="请输入关键字搜索" />
                 </van-cell-group>
                 <template v-for="(child, index) in  proxyStore">
                     <div class="pos" v-if="checkSearchKey(index, searchKey)">

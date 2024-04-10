@@ -3,6 +3,21 @@ import { ref } from "vue"
 
 import { showToast, showConfirmDialog } from "vant";
 import { mainStorage } from "@/mainStorage"
+import { onMounted, watch } from "vue"
+import { otherStore } from "@/otherStore"
+
+onMounted(() => {
+
+    watch([() => otherStore.otherUpdate], async () => {
+        onUpdateStatus()
+    })
+    onUpdateStatus()
+})
+
+const onUpdateStatus = async () => {
+    let t = await mainStorage.getStatusByCloud()
+    console.log(t)
+}
 
 const onStoreReset = () => {
     mainStorage.loadStoreByLocalStorage()
@@ -31,7 +46,7 @@ const onProxyStoreReset = () => {
 
 const onProxyStorageClear = () => {
     mainStorage.clearProxyStoreByLocalStorage()
-    showConfirmDialog({title:"是否刷新?"})
+    showConfirmDialog({ title: "是否刷新?" })
     showToast("已经清空localstorage的代理列表")
 }
 

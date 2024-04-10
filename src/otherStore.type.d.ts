@@ -1,4 +1,5 @@
-export type OtherStoreType={
-    proxyListUpdate:number,
-    loadingMsg:string
+export type OtherStoreType = {
+    proxyListUpdate: number,
+    otherUpdate: number,
+    loadingMsg: string
 }

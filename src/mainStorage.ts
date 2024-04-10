@@ -1,207 +1,213 @@
-import {saveStore,loadStore, saveProxyStore, loadProxyStore, objectAssign} from "./tool"
-import {type StoreType } from "./store.type.d"
-import {type ProxyStoreType } from "./proxyStore.type.d"
+import { saveStore, loadStore, saveProxyStore, loadProxyStore, objectAssign } from "./tool"
+import { type StoreType } from "./store.type.d"
+import { type ProxyStoreType } from "./proxyStore.type.d"
 import { proxyStore } from "./proxyStore"
 import { store } from "./store"
 
-class MainStorage{
-    storeStorageKey="store"
+class MainStorage {
+    storeStorageKey = "store"
     originStoreData!: StoreType
-    proxyStoreStorageKey="proxyStore"
+    proxyStoreStorageKey = "proxyStore"
 
-    backupStore(){
-        this.originStoreData=saveStore()
+    backupStore() {
+        this.originStoreData = saveStore()
     }
 
-    saveStoreByLocalStorage(){
-        localStorage.setItem(this.storeStorageKey,JSON.stringify(saveStore()))
+    saveStoreByLocalStorage() {
+        localStorage.setItem(this.storeStorageKey, JSON.stringify(saveStore()))
     }
 
-    saveProxyStoreByLocalStorage(){
-        localStorage.setItem(this.proxyStoreStorageKey,JSON.stringify(saveProxyStore()))
+    saveProxyStoreByLocalStorage() {
+        localStorage.setItem(this.proxyStoreStorageKey, JSON.stringify(saveProxyStore()))
     }
 
-    loadStoreByLocalStorage(){
-        let s=localStorage.getItem(this.storeStorageKey)
-        if(!s){
+    loadStoreByLocalStorage() {
+        let s = localStorage.getItem(this.storeStorageKey)
+        if (!s) {
             return false
         }
-        let d:StoreType=JSON.parse(s)
+        let d: StoreType = JSON.parse(s)
         loadStore(d)
         return true
     }
 
-    clearStoreByLocalStorage(){
-            localStorage.setItem(this.storeStorageKey,"")
+    clearStoreByLocalStorage() {
+        localStorage.setItem(this.storeStorageKey, "")
     }
 
-    loadProxyStoreByLocalStorage(){
-        let s=localStorage.getItem(this.proxyStoreStorageKey)
-        if(!s){
+    loadProxyStoreByLocalStorage() {
+        let s = localStorage.getItem(this.proxyStoreStorageKey)
+        if (!s) {
             return false
         }
-        let d:ProxyStoreType[]=JSON.parse(s)
+        let d: ProxyStoreType[] = JSON.parse(s)
         console.log(d)
         loadProxyStore(d)
         return true
     }
 
-    reloadProxyStore(){
-            let s=proxyStore.map(c=>{return objectAssign(c)})
-            proxyStore.splice(0,proxyStore.length)
-            for(let i=0;i<s.length;i++){
-                let c=s[i]
-                proxyStore.push(c)
-            }
+    reloadProxyStore() {
+        let s = proxyStore.map(c => { return objectAssign(c) })
+        proxyStore.splice(0, proxyStore.length)
+        for (let i = 0; i < s.length; i++) {
+            let c = s[i]
+            proxyStore.push(c)
+        }
     }
 
-    clearProxyStoreByLocalStorage(){
-        localStorage.setItem(this.proxyStoreStorageKey,"")
+    clearProxyStoreByLocalStorage() {
+        localStorage.setItem(this.proxyStoreStorageKey, "")
     }
 
-   async loadStoreByCloud(){
-        let s=await fetch('/store').then(c=>c.text())
-        if(!s){
+    async loadStoreByCloud() {
+        let s = await fetch('/store').then(c => c.text())
+        if (!s) {
             return false
         }
-        let j:StoreType=JSON.parse(s)
+        let j: StoreType = JSON.parse(s)
         loadStore(j)
         return true
     }
 
-    async loadPorxyStoreByCloud(){
-        let s=await fetch("/proxystore").then(c=>c.text())
-        if(!s){
+    async loadPorxyStoreByCloud() {
+        let s = await fetch("/proxystore").then(c => c.text())
+        if (!s) {
             return false
         }
-        let j:ProxyStoreType[]=JSON.parse(s)
+        let j: ProxyStoreType[] = JSON.parse(s)
         loadProxyStore(j)
         return true
     }
 
-    async saveStoreByCloud(){
-        let req=await fetch("/saveStore",{
-            method:"post",
-            body:JSON.stringify(saveStore()),
-            headers:{
-                "Content-Type":"application/json"
+    async saveStoreByCloud() {
+        let req = await fetch("/saveStore", {
+            method: "post",
+            body: JSON.stringify(saveStore()),
+            headers: {
+                "Content-Type": "application/json"
             }
         })
-        let t=await req.text()
-        if(t.indexOf("success")!=-1){
+        let t = await req.text()
+        if (t.indexOf("success") != -1) {
             return true
         }
         return false
     }
 
-    async applyStoreByCloud(){
-        let req=await fetch("/applyStore",{
-            method:"post",
-            body:JSON.stringify(saveStore()),
-            headers:{
-                "Content-Type":"application/json"
+    async applyStoreByCloud() {
+        let req = await fetch("/applyStore", {
+            method: "post",
+            body: JSON.stringify(saveStore()),
+            headers: {
+                "Content-Type": "application/json"
             }
         })
-        let t=await req.text()
-        if(t.indexOf("success")!=-1){
+        let t = await req.text()
+        if (t.indexOf("success") != -1) {
             return true
         }
         return false
     }
 
-    async saveProxyStoreByCloud(){
-        let req=await fetch("/saveProxyListStore",{
-            method:"post",
-            body:JSON.stringify(saveProxyStore()),
-            headers:{
-                "Content-Type":"application/json"
+    async saveProxyStoreByCloud() {
+        let req = await fetch("/saveProxyListStore", {
+            method: "post",
+            body: JSON.stringify(saveProxyStore()),
+            headers: {
+                "Content-Type": "application/json"
             }
         })
-        let t=await req.text()
-        if(t.indexOf("success")!=-1){
+        let t = await req.text()
+        if (t.indexOf("success") != -1) {
             return true
         }
         return false
     }
 
-    async applyProxyStoreByCloud(){
-        let req=await fetch("/applyProxyListStore",{
-            method:"post",
-            body:JSON.stringify(saveProxyStore()),
-            headers:{
-                "Content-Type":"application/json"
+    async applyProxyStoreByCloud() {
+        let req = await fetch("/applyProxyListStore", {
+            method: "post",
+            body: JSON.stringify(saveProxyStore()),
+            headers: {
+                "Content-Type": "application/json"
             }
         })
-        let t=await req.text()
-        if(t.indexOf("success")!=-1){
+        let t = await req.text()
+        if (t.indexOf("success") != -1) {
             return true
         }
         return false
     }
 
-    async loadCrtFileByCloud(){
-        let req=await fetch('/loadCrtFile',{
-            method:"post",
-            body:JSON.stringify({url:store.crtUrl}),
-            headers:{
-                "Content-Type":"application/json"
+    async loadCrtFileByCloud() {
+        let req = await fetch('/loadCrtFile', {
+            method: "post",
+            body: JSON.stringify({ url: store.crtUrl }),
+            headers: {
+                "Content-Type": "application/json"
             }
         })
-        let s=await req.text()
-        if(!s){
+        let s = await req.text()
+        if (!s) {
             return false
         }
-        store.crtContent=s      
-        return true  
+        store.crtContent = s
+        return true
     }
 
-    async saveCrtFileByCloud(){
-        let req=await fetch("/saveCrtFile",{
-            method:'post',
-            body:JSON.stringify({url:store.crtUrl,content:store.crtContent}),
-            headers:{
-                "Content-Type":"application/json"
+    async saveCrtFileByCloud() {
+        let req = await fetch("/saveCrtFile", {
+            method: 'post',
+            body: JSON.stringify({ url: store.crtUrl, content: store.crtContent }),
+            headers: {
+                "Content-Type": "application/json"
             }
         })
-        let s=await req.text()
-        if(s.indexOf("success")!=-1){
+        let s = await req.text()
+        if (s.indexOf("success") != -1) {
             return true
         }
         return false
     }
 
-    async loadKeyFileByCloud(){
-        let req=await fetch('/loadKeyFile',{
-            method:"post",
-            body:JSON.stringify({url:store.keyUrl}),
-            headers:{
-                "Content-Type":"application/json"
+    async loadKeyFileByCloud() {
+        let req = await fetch('/loadKeyFile', {
+            method: "post",
+            body: JSON.stringify({ url: store.keyUrl }),
+            headers: {
+                "Content-Type": "application/json"
             }
         })
-        let s=await req.text()
-        if(!s){
+        let s = await req.text()
+        if (!s) {
             return false
         }
-        store.keyContent=s      
-        return true  
+        store.keyContent = s
+        return true
     }
 
-    async saveKeyFileByCloud(){
-        let req=await fetch("/saveKeyFile",{
-            method:'post',
-            body:JSON.stringify({url:store.keyUrl,content:store.keyContent}),
-            headers:{
-                "Content-Type":"application/json"
+    async saveKeyFileByCloud() {
+        let req = await fetch("/saveKeyFile", {
+            method: 'post',
+            body: JSON.stringify({ url: store.keyUrl, content: store.keyContent }),
+            headers: {
+                "Content-Type": "application/json"
             }
         })
-        let s=await req.text()
-        if(s.indexOf("success")!=-1){
+        let s = await req.text()
+        if (s.indexOf("success") != -1) {
             return true
         }
         return false
+    }
+
+    async getStatusByCloud() {
+        let req = await fetch("/status?xx")
+        let s = await req.text()
+        return s
     }
 
 }
 
-export const mainStorage=new MainStorage()
+export const mainStorage = new MainStorage()
 mainStorage.backupStore()
