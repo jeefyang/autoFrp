@@ -14,8 +14,20 @@ onMounted(async () => {
   let config: ConfigType = await fetch('/config').then(s => s.json())
   store.crtUrl = config.crtUrl || store.crtUrl
   store.keyUrl = config.keyUrl || store.keyUrl
-  mainStorage.loadStoreByLocalStorage()
-  mainStorage.loadProxyStoreByLocalStorage()
+  if (mainStorage.isStoreBeginlocalStorage()) {
+    mainStorage.loadStoreByCloud()
+  }
+  else {
+    mainStorage.loadStoreByLocalStorage()
+  }
+
+  if (mainStorage.isProxyStoreBeginlocalStorage()) {
+    mainStorage.loadPorxyStoreByCloud()
+  }
+  else {
+    mainStorage.loadProxyStoreByLocalStorage()
+  }
+
 
 })
 

@@ -104,9 +104,9 @@ const onProxyStorageCloud = async () => {
                 </div>
                 主配置:
                 <div>
-                    <van-button class="btn" type="primary">重置当前</van-button>
-                    <van-button class="btn" type="primary">读取云端</van-button>
-                    <van-button class="btn" type="primary">清空本地</van-button>
+                    <van-button class="btn" type="primary" @click="onStoreReset">重置当前</van-button>
+                    <van-button class="btn" type="primary" @click="onStoreCloud">读取云端</van-button>
+                    <van-button class="btn" type="primary" @click="onStoreClear">清空本地</van-button>
                 </div>
                 代理配置:
                 <div>

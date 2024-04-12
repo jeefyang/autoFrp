@@ -22,6 +22,14 @@ class MainStorage {
         localStorage.setItem(this.proxyStoreStorageKey, JSON.stringify(saveProxyStore()))
     }
 
+    isStoreBeginlocalStorage() {
+        let s = localStorage.getItem(this.storeStorageKey)
+        if (!s) {
+            return true
+        }
+        return false
+    }
+
     loadStoreByLocalStorage() {
         let s = localStorage.getItem(this.storeStorageKey)
         if (!s) {
@@ -34,6 +42,14 @@ class MainStorage {
 
     clearStoreByLocalStorage() {
         localStorage.setItem(this.storeStorageKey, "")
+    }
+
+    isProxyStoreBeginlocalStorage() {
+        let s = localStorage.getItem(this.proxyStoreStorageKey)
+        if (!s) {
+            return true
+        }
+        return false
     }
 
     loadProxyStoreByLocalStorage() {
@@ -71,7 +87,7 @@ class MainStorage {
     }
 
     async loadPorxyStoreByCloud() {
-        let s = await fetch("/proxystore").then(c => c.text())
+        let s = await fetch("/proxyListStore").then(c => c.text())
         if (!s) {
             return false
         }
