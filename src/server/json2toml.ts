@@ -4,10 +4,15 @@ import type { BackupDataType } from "./type.d";
 export function backupJson2frpcToml(j: BackupDataType) {
     let toml: string = ""
     let addFunc = (key: string, val: string | number | boolean) => {
-        if (!val) {
-            return
+        let v = val
+        if (typeof (val) == "string") {
+            if (!val) {
+                return
+            }
+            v = `"${val}"`
         }
-        toml += `${key} = ${val.toString()}\n`
+
+        toml += `${key} = ${v.toString()}\n`
     }
     if (!j.store) {
         return
@@ -105,7 +110,7 @@ export function backupJson2frpcToml(j: BackupDataType) {
             addFunc("allowUsers", `[${c.xtcpAllowUsers.split(" ").map(c => `"${c}"`).join(",")}]`)
         }
 
-        toml+='\n'
+        toml += '\n'
     }
 
     return toml
