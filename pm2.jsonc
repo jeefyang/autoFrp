@@ -1,5 +1,5 @@
 {
-    "app": [
+    "apps": [
         {
             "name": "autoFrp_node",
             "script": "./build_node/server.js",

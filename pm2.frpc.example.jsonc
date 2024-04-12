@@ -1,5 +1,5 @@
 {
-    "app": [
+    "apps": [
         {
             "name": "autoFrp_frpc",
             "script": "./extract/frpc -c ./frpc.auto.toml",
