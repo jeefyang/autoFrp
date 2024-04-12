@@ -35,7 +35,7 @@ const onSetFrp = async (type: SetFrpType) => {
         showToast(`${l.find(c => c.t == type)?.c || ""} 请求失败`)
         return
     }
-    showToast(`${l.find(c => c.t == type)?.c || ""} 请求成功`)
+    showToast(`${type} 请求成功`)
     t.frpStatus && (frpStatus.value = t.frpStatus)
 
 }
