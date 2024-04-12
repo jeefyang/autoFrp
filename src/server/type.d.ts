@@ -31,6 +31,7 @@ export type FrpStatusSendType = {
 
 export type SetFrpSendType = {
     status: boolean,
+    act:SetFrpType
     frpStatus?: FrpStatusType,
     content?: string
 }
