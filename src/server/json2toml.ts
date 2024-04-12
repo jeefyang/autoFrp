@@ -46,7 +46,7 @@ export function backupJson2frpcToml(j: BackupDataType) {
     addFunc('transport.tcpMuxKeepaliveInterval', j.store.tcpMuxKeepaliveInterval)
     addFunc('transport.heartbeatInterval', j.store.heartbeatInterval)
     addFunc('transport.heartbeatTimeout', j.store.heartbeatTimeout)
-    addFunc('transport.tls', j.store.tls)
+    // addFunc('transport.tls', j.store.tls)
 
     toml += '\n'
 
@@ -66,14 +66,14 @@ export function backupJson2frpcToml(j: BackupDataType) {
         addFunc("transport.useCompression", c.useCompression)
         addFunc("transport.bandwidthLimit", c.bandwidthLimit)
         addFunc("transport.bandwidthLimitMode", c.bandwidthLimitMode)
-        addFunc("transport.tls", false)
+
         if (c.proxyProtocolVersion != 'none') {
             addFunc("transport.proxyProtocolVersion", c.proxyProtocolVersion)
         }
 
         if (c.type == "http" || c.type == "https") {
             if (c.subdomain) {
-                addFunc("subdomain", c.subdomain)
+                addFunc("customDomains", `["${c.subdomain}.${j.store.serverAddr}"]`)
             }
             else if (c.customDomains) {
                 addFunc('customDomains', arrFunc(c.customDomains))

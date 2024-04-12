@@ -13,9 +13,6 @@ const onUpdate = (v: string | number) => {
 }
 
 onMounted(() => {
-    console.log("11")
-    console.log(model.value)
-
 
     watch([model], () => {
         tempModel.value = model.value
