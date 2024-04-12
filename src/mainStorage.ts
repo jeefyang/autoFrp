@@ -1,8 +1,9 @@
 import { saveStore, loadStore, saveProxyStore, loadProxyStore, objectAssign } from "./tool"
-import { type StoreType } from "./store.type.d"
-import { type ProxyStoreType } from "./proxyStore.type.d"
+import { type StoreType } from "@/server/store.type.d"
+import { type ProxyStoreType } from "@/server/proxyStore.type.d"
 import { proxyStore } from "./proxyStore"
 import { store } from "./store"
+import type { FrpStatusSendType, SetFrpSendType, SetFrpType } from '@/server/type'
 
 class MainStorage {
     storeStorageKey = "store"
@@ -201,10 +202,16 @@ class MainStorage {
         return false
     }
 
-    async getStatusByCloud() {
-        let req = await fetch("/status?xx")
-        let s = await req.text()
+    async getFrpStatusByCloud() {
+        let req = await fetch("/frpStatus")
+        let s: FrpStatusSendType = await req.json()
         return s
+    }
+
+    async setFrpByCloud(type: SetFrpType) {
+        let req = await fetch(`/setFrp?${type}`)
+        let j: SetFrpSendType = await req.json()
+        return j
     }
 
 }

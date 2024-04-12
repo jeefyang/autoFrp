@@ -5,18 +5,37 @@ import { showToast, showConfirmDialog } from "vant";
 import { mainStorage } from "@/mainStorage"
 import { onMounted, watch } from "vue"
 import { otherStore } from "@/otherStore"
+import type { FrpStatusType, SetFrpType } from "@/server/type.d";
+
+const frpStatus = ref(<"null" | "online" | "offline">"null")
 
 onMounted(() => {
 
     watch([() => otherStore.otherUpdate], async () => {
-        onUpdateStatus()
+        onRefreshFrpStatus()
     })
-    onUpdateStatus()
+    onRefreshFrpStatus()
 })
 
-const onUpdateStatus = async () => {
-    let t = await mainStorage.getStatusByCloud()
-    console.log(t)
+const onRefreshFrpStatus = async () => {
+    let t = await mainStorage.getFrpStatusByCloud()
+    frpStatus.value = t.status
+    showToast("已经刷新了frpc状态")
+}
+
+const onSetFrp = async (type: SetFrpType) => {
+    let l: { t: SetFrpType, c: string }[] = [
+        { t: "start", c: `无法启动frpc服务` },
+        { t: "restart", c: `无法重启frpc服务` },
+        { t: "stop", c: `无法停止frpc服务` },
+        { t: "delete", c: `无法删除frpc服务` }
+    ]
+    let t = await mainStorage.setFrpByCloud(type)
+    if (!t.status) {
+        showToast(l.find(c => c.t == type)?.c || "")
+        return
+    }
+    t.frpStatus && (frpStatus.value = t.frpStatus)
 }
 
 const onStoreReset = () => {
@@ -67,8 +86,21 @@ const onProxyStorageCloud = async () => {
         <div class="display">
             <van-cell-group inset>
                 状态:
+                <div class="frpstatus">
+                    <div>{{ frpStatus }}</div>
+                    <div>
+                        <van-button class="btn" type="primary" @click="onRefreshFrpStatus">刷新</van-button>
+                    </div>
+                </div>
                 <div>
-                    123
+                    <van-button class="btn" type="primary" :disabled="frpStatus == 'online'"
+                        @click="onSetFrp('start')">启动</van-button>
+                    <van-button class="btn" type="primary" :disabled="frpStatus != 'online'"
+                        @click="onSetFrp('restart')">重启</van-button>
+                    <van-button class="btn" type="primary" :disabled="frpStatus != 'online'"
+                        @click="onSetFrp('stop')">停止</van-button>
+                    <van-button class="btn" type="primary" :disabled="frpStatus == 'null'"
+                        @click="onSetFrp('delete')">删除</van-button>
                 </div>
                 主配置:
                 <div>
@@ -124,7 +156,11 @@ const onProxyStorageCloud = async () => {
     /* bottom: 0px; */
     /* position: absolute; */
     width: 100%;
+}
 
-
+.frpstatus {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 </style>

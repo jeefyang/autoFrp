@@ -342,4 +342,4 @@ const onApplyUpdate = async () => {
     justify-content: space-around;
     align-items: center;
 }
-</style>
+</style>@/server/proxyStore.type

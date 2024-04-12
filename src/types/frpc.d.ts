@@ -1,4 +1,4 @@
-type frpcConfigProxyType = (frpProxyTCPType | frpProxyHTTPType | frpProxyHTTPSType | frpProxySTCPType | frpProxySUDPType | frpProxyUDPType)
+type frpcConfigProxyType = (frpProxyTCPType | frpProxyHTTPType | frpProxyHTTPSType | frpProxySTCPType | frpProxySUDPType | frpProxyUDPType | frpProxyXTCPType)
 
 type frpcConfigType = {
     /** 代理配置，不同的代理类型对应不同的配置，例如 TCPProxyConfig 或 HTTPProxyConfig */

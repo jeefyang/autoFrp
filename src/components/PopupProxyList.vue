@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineProps, ref, onMounted, watch } from "vue"
-import { type ProxyStoreType } from "@/proxyStore.type.d"
+import { type ProxyStoreType } from "@/server/proxyStore.type.d"
 import EasySwitch from "./EasySwitch.vue"
 import EasyPicker from "./EasyPicker.vue"
 import EasyPW from "./EasyPW.vue"
@@ -182,4 +182,4 @@ const alertFunc = (s: string, e?: MouseEvent,) => {
     </van-popup>
 
 </template>
-<style scoped></style>
+<style scoped></style>@/server/proxyStore.type

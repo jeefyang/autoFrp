@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { log } from 'console';
 import { ref, defineModel, defineProps, defineEmits, onMounted } from 'vue'
 
 const showPicker = ref(false)

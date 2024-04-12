@@ -1,7 +1,7 @@
 import { proxyStore } from "./proxyStore"
-import { type ProxyStoreType } from "./proxyStore.type.d"
+import { type ProxyStoreType } from "@/server/proxyStore.type.d"
 import { store } from "./store"
-import { type StoreType } from './store.type.d'
+import { type StoreType } from '@/server/store.type.d'
 
 export function createProxyStore() {
     let d: ProxyStoreType = {

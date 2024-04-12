@@ -1,17 +1,37 @@
+import type { ProxyStoreType } from "./proxyStore.type.d"
+import type { StoreType } from "./store.type.d"
+
 export type ConfigType = {
     /** 监听端口 */
     listen: number
     /** 备份用的文件 */
-    backupFile:string
+    backupFile: string
     /** crt证书路径 */
-    crtUrl:string
+    crtUrl: string
     /** key密钥路径 */
-    keyUrl:string
+    keyUrl: string
     /** frpc的pm2的名字 */
-    frpcPM2Name:string
+    frpcPM2Name: string
+    /** frpc的toml文件 */
+    frpcTomlName: string
 }
 
-export type BackupDataType={
-    store?:any
-    proxyListStore?:any[]
+export type BackupDataType = {
+    store?: StoreType
+    proxyListStore?: ProxyStoreType[]
 }
+
+export type FrpStatusType = 'null' | 'online' | 'offline'
+
+export type SetFrpType = 'start' | 'restart' | 'stop' | 'delete'
+
+export type FrpStatusSendType = {
+    status: FrpStatusType
+}
+
+export type SetFrpSendType = {
+    status: boolean,
+    frpStatus?: FrpStatusType,
+    content?: string
+}
+

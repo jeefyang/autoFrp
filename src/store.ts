@@ -1,6 +1,6 @@
 import { reactive } from "vue"
-import { type StoreType } from "./store.type.d"
-import {saveStore} from "./tool"
+import { type StoreType } from "@/server/store.type.d"
+import { saveStore } from "./tool"
 
 export const store = reactive(<StoreType>{
     serverAddr: "127.0.0.1",
@@ -25,8 +25,8 @@ export const store = reactive(<StoreType>{
     poolCount: -1,
     vhostHTTPPort: 6300,
     vhostHTTPSPort: 6301,
-    crtContent:"",
-    crtUrl:"./server.crt",
-    keyContent:"",
-    keyUrl:"./server.key"
+    crtContent: "",
+    crtUrl: "./server.crt",
+    keyContent: "",
+    keyUrl: "./server.key"
 })

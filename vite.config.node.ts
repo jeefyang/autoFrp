@@ -15,10 +15,16 @@ async function frpInit() {
     var leaveZipped = false;
     let includename = "linux_amd64"
     let filename: string = ""
+    let pm2FileName = "pm2.frpc.jsonc"
+    let pm2ExampleFile = "./pm2.frpc.example.jsonc"
 
     if (!fs.existsSync(frp_dir)) {
         fs.mkdirSync(frp_dir)
         console.log("创建文件夹", frp_dir)
+    }
+    if (!fs.existsSync(path.join(frp_dir, pm2FileName))) {
+        fs.writeFileSync(path.join(frp_dir, pm2FileName), fs.readFileSync(pm2ExampleFile))
+        console.log(`复制frpc的PM2文件:${path.join(frp_dir, pm2FileName)}`)
     }
     let list = fs.readdirSync(frp_dir)
     for (let i = 0; i < list.length; i++) {

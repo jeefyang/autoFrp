@@ -12,7 +12,7 @@ export type ProxyStoreType = {
     /** 限流类型，客户端限流或服务端限流，可选值为 client 和 server，默认为客户端限流 */
     bandwidthLimitMode: "client" | "server"
     /** 启用 proxy protocol 协议的版本，可选值为 v1 和 v2。如果启用，则 frpc 和本地服务建立连接后会发送 proxy protocol 的协议，包含了原请求的 IP 地址和端口等内容 */
-    proxyProtocolVersion: "none"|"v1" | "v2"
+    proxyProtocolVersion: "none" | "v1" | "v2"
     /** 是否开启用户验证 */
     enableHttpVerify: boolean
     /** HTTP Basic Auth 用户名 */
@@ -43,16 +43,16 @@ export type ProxyStoreType = {
     https2httpKeypath: string
     /** 替换 Host header */
     https2httpHostHeaderRewrite: string
-     /** 是否替换 Host Header */
-    enableHostHeaderRewrite:boolean
+    /** 是否替换 Host Header */
+    enableHostHeaderRewrite: boolean
     /** 替换 Host Header */
-    hostHeaderRewrite:string
+    hostHeaderRewrite: string
     /** stcp密钥，服务端和访问端的密钥需要一致，访问端才能访问到服务端 */
-    stcpSecretKey:string
+    stcpSecretKey: string
     /** xtcp密钥，服务端和访问端的密钥需要一致，访问端才能访问到服务端 */
-    xtcpSecretKey:string
+    xtcpSecretKey: string
     /** 允许访问的 visitor 用户列表，默认只允许同一用户下的 visitor 访问，配置为 * 则允许任何 visitor 访问,用空格隔开 */
-    stcpAllowUsers:string
+    stcpAllowUsers: string
     /** 允许访问的 visitor 用户列表，默认只允许同一用户下的 visitor 访问，配置为 * 则允许任何 visitor 访问,用空格隔开 */
-    xtcpAllowUsers:string
+    xtcpAllowUsers: string
 }

@@ -4,9 +4,10 @@ import mime from "mime"
 import fs from "fs"
 import path from "path"
 import bodyparser from "body-parser"
-import { type ConfigType, type BackupDataType } from "./type.d"
+import type { ConfigType, BackupDataType, FrpStatusType, SetFrpType, FrpStatusSendType, SetFrpSendType } from "./type.d"
 import { execSync } from "child_process"
 import shell from "shelljs"
+import { backupJson2frpcToml } from "./json2toml"
 
 
 
@@ -36,10 +37,10 @@ console.log(`环境为:${import.meta.env.MODE}`)
 
 const vue_Router_list: string[] = ["/", "/list", "/other", "/home"]
 
-app.get("/status", async (req, res) => {
+let getFrpStatus = () => {
     let out = shell.exec("pm2 ls").stdout
     let list = out.split('\n')
-    let status = "undefined"
+    let status: FrpStatusType = "null"
     for (let i = 0; i < list.length; i++) {
         let c = list[i]
         if (c.indexOf(configjson.frpcPM2Name) == -1) {
@@ -53,12 +54,18 @@ app.get("/status", async (req, res) => {
         }
         break
     }
-    res.send(JSON.stringify({ status }))
+    return status
+}
+
+app.get("/frpStatus", async (req, res) => {
+    let status = getFrpStatus()
+    let j: FrpStatusSendType = { status }
+    res.send(JSON.stringify(j))
 })
 
 app.get("/setFrp", async (req, res) => {
     let u = new URL(`http://localhost${req.url}`)
-    let list = ['start', "restart", "stop", "delete"]
+    let list: SetFrpType[] = ['start', "restart", "stop", "delete"]
     let act = ""
     act = list.find(c => u.searchParams.has(c)) || ""
     let status = false
@@ -68,7 +75,13 @@ app.get("/setFrp", async (req, res) => {
     }
     let out = shell.exec(`pm2 ${act} ./pm2.jsonc`, { cwd: configjson.frpcPM2Name }).stdout
     status = true
-    res.send(JSON.stringify({ status, content: out }))
+    let frpStatus = getFrpStatus()
+    let j: SetFrpSendType = {
+        status,
+        frpStatus,
+        content: out
+    }
+    res.send(JSON.stringify(j))
     return
 })
 
@@ -128,6 +141,7 @@ const saveStoreFunc = (o: any) => {
     }
     d.store = o
     fs.writeFileSync(configjson.backupFile, JSON.stringify(d), "utf-8")
+    return d
 }
 
 app.post("/saveStore", async (req, res) => {
@@ -137,7 +151,9 @@ app.post("/saveStore", async (req, res) => {
 })
 
 app.post("/applyStore", async (req, res) => {
-    saveStoreFunc(req.body)
+    let d = saveStoreFunc(req.body)
+    let t = backupJson2frpcToml(d) || ""
+    fs.writeFileSync(configjson.frpcTomlName, t, { encoding: "utf-8" })
     res.send("saveStore success!!!")
     return
 })
@@ -210,6 +226,7 @@ const saveProxyListStoreFunc = (o: any) => {
     }
     d.proxyListStore = o
     fs.writeFileSync(configjson.backupFile, JSON.stringify(d), "utf-8")
+    return d
 }
 
 app.post("/saveProxyListStore", async (req, res) => {
@@ -219,8 +236,9 @@ app.post("/saveProxyListStore", async (req, res) => {
 })
 
 app.post("/applyProxyListStore", async (req, res) => {
-    console.log(123, req.body)
-    saveProxyListStoreFunc(req.body)
+    let d = saveProxyListStoreFunc(req.body)
+    let t = backupJson2frpcToml(d) || ""
+    fs.writeFileSync(configjson.frpcTomlName, t, { encoding: "utf-8" })
     res.send("saveProxyListStore success!!!")
     return
 })
