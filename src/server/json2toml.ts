@@ -7,7 +7,7 @@ export function backupJson2frpcToml(j: BackupDataType) {
         if (!val) {
             return
         }
-        toml += `${key} = ${val.toString()}`
+        toml += `${key} = ${val.toString()}\n`
     }
     if (!j.store) {
         return
@@ -104,6 +104,8 @@ export function backupJson2frpcToml(j: BackupDataType) {
             addFunc("secretKey", c.xtcpSecretKey)
             addFunc("allowUsers", `[${c.xtcpAllowUsers.split(" ").map(c => `"${c}"`).join(",")}]`)
         }
+
+        toml+='\n'
     }
 
     return toml
