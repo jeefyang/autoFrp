@@ -66,6 +66,7 @@ export function backupJson2frpcToml(j: BackupDataType) {
         addFunc("transport.useCompression", c.useCompression)
         addFunc("transport.bandwidthLimit", c.bandwidthLimit)
         addFunc("transport.bandwidthLimitMode", c.bandwidthLimitMode)
+        addFunc("transport.tls", false)
         if (c.proxyProtocolVersion != 'none') {
             addFunc("transport.proxyProtocolVersion", c.proxyProtocolVersion)
         }
@@ -84,7 +85,7 @@ export function backupJson2frpcToml(j: BackupDataType) {
         }
 
         if (c.type == "http") {
-            if (c.locations) {
+            if (c.enableLocations && c.locations) {
                 addFunc('locations', arrFunc(c.locations))
             }
             if (c.enableHttpVerify) {
