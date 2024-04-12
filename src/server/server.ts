@@ -73,7 +73,7 @@ app.get("/setFrp", async (req, res) => {
         res.send(JSON.stringify({ status }))
         return
     }
-    let out = shell.exec(`pm2 ${act} ./pm2.jsonc`, { cwd: "./frp" }).stdout
+    let out = shell.exec(`pm2 ${act} ./pm2.frpc.jsonc`, { cwd: "./frp" }).stdout
     status = true
     let frpStatus = getFrpStatus()
     let j: SetFrpSendType = {
