@@ -3,6 +3,7 @@ import { defineProps, ref, onMounted, watch } from "vue"
 import { type ProxyStoreType } from "@/server/proxyStore.type.d"
 import EasySwitch from "./EasySwitch.vue"
 import EasyPicker from "./EasyPicker.vue"
+import EasyNum from './EasyNum.vue'
 import EasyPW from "./EasyPW.vue"
 import { showToast } from "vant"
 
@@ -90,14 +91,14 @@ const alertFunc = (s: string, e?: MouseEvent,) => {
             </EasyPicker>
             <van-field autosize type="text" v-model="data.localIP" @click="alertFunc(desc.localIP, $event)"
                 label="内网ip:" placeholder="请输入内网ip" />
-            <van-field autosize type="number" v-model="data.localPort" @click="alertFunc(desc.localPort, $event)"
+            <EasyNum v-model="data.localPort" @click="alertFunc(desc.localPort, $event)"
                 label="ip端口:" placeholder="请输入端口号" />
             <template v-if="data.type == 'tcp'">
-                <van-field autosize type="number" v-model="data.remotePort" @click="alertFunc(desc.remotePort, $event)"
+                <EasyNum v-model="data.remotePort" @click="alertFunc(desc.remotePort, $event)"
                     label="远程端口:" placeholder="请输入端口号" />
             </template>
             <template v-if="data.type == 'udp'">
-                <van-field autosize type="number" v-model="data.remotePort" @click="alertFunc(desc.remotePort, $event)"
+                <EasyNum v-model="data.remotePort" @click="alertFunc(desc.remotePort, $event)"
                     label="远程端口:" placeholder="请输入端口号" />
             </template>
             <template v-if="data.type == 'http'">

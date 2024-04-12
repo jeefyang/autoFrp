@@ -37,6 +37,7 @@ class MainStorage {
         }
         let d: StoreType = JSON.parse(s)
         loadStore(d)
+        console.log(store.serverPort)
         return true
     }
 

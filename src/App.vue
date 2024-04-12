@@ -15,20 +15,24 @@ onMounted(async () => {
   store.crtUrl = config.crtUrl || store.crtUrl
   store.keyUrl = config.keyUrl || store.keyUrl
   if (mainStorage.isStoreBeginlocalStorage()) {
+    console.log("读取云端store")
     mainStorage.loadStoreByCloud()
   }
   else {
+    console.log("读取localstorage的store")
     mainStorage.loadStoreByLocalStorage()
   }
 
   if (mainStorage.isProxyStoreBeginlocalStorage()) {
+    console.log("读取云端ProxyStore")
     mainStorage.loadPorxyStoreByCloud()
   }
   else {
+    console.log("读取localstorage的ProxyStore")
     mainStorage.loadProxyStoreByLocalStorage()
   }
 
-
+  otherStore.numUpdate++
 })
 
 const onUpdateListView = () => {

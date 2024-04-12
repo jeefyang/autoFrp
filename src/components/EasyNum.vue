@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, defineModel, defineProps, onMounted } from "vue"
+import { ref, defineModel, defineProps, onMounted, watch } from "vue"
+import { otherStore } from "@/otherStore"
 const model = defineModel<number>({ required: true })
 const tempModel = ref(<number>model.value)
 defineProps<{
@@ -12,8 +13,18 @@ const onUpdate = (v: string | number) => {
 }
 
 onMounted(() => {
-    onUpdate(model.value)
+    console.log("11")
+    console.log(model.value)
+
+
+    watch([model], () => {
+        tempModel.value = model.value
+    })
+    watch([() => otherStore.numUpdate], () => {
+        onUpdate(model.value)
+    })
 })
+
 
 
 </script>

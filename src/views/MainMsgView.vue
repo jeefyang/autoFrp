@@ -149,7 +149,7 @@ const onSaveCrtFile = async () => {
                     <van-field autosize type="text" v-model="store.webServerAddr"
                         @click="alertFunc(desc.webServerAddr, $event)" label="管理地址:" placeholder="请输入管理地址" />
 
-                    <van-field autosize type="number" v-model="store.webServerPort"
+                    <EasyNum v-model="store.webServerPort"
                         @click="alertFunc(desc.webServerPort, $event)" label="管理端口:" placeholder="请输入管理端口" />
 
                     <van-field autosize type="text" v-model="store.webServerUser"
@@ -166,11 +166,11 @@ const onSaveCrtFile = async () => {
                         :inactive-color="inactiveColor" :active-color="activeColor" label="TCP 多路复用:">
                     </EasySwitch>
 
-                    <van-field autosize type="number" @click="alertFunc(desc.heartbeatInterval, $event)"
+                    <EasyNum @click="alertFunc(desc.heartbeatInterval, $event)"
                         right-icon="warning-o" v-model="store.heartbeatInterval" label="心跳包间隔时间:"
                         placeholder="请输入间隔秒数" />
 
-                    <van-field autosize type="number" @click="alertFunc(desc.heartbeatTimeout, $event)"
+                    <EasyNum @click="alertFunc(desc.heartbeatTimeout, $event)"
                         right-icon="warning-o" v-model="store.heartbeatTimeout" label="心跳包超时:" placeholder="请输入超时秒数" />
 
                     <EasyPicker @labelclick="alertFunc(desc.loglevel)" v-model="store.loglevel" label="日志等级:"
