@@ -3,13 +3,16 @@ import type { BackupDataType } from "./type.d";
 
 export function backupJson2frpcToml(j: BackupDataType) {
     let toml: string = ""
-    let addFunc = (key: string, val: string | number | boolean) => {
+    let addFunc = (key: string, val: string | number | boolean | string[]) => {
         let v = val
         if (typeof (val) == "string") {
             if (!val) {
                 return
             }
             v = `"${val}"`
+        }
+        if (Array.isArray(val)) {
+            v = `[${val.map(c => `"${c}"`).join(",")}]`
         }
 
         toml += `${key} = ${v.toString()}\n`
@@ -73,7 +76,7 @@ export function backupJson2frpcToml(j: BackupDataType) {
 
         if (c.type == "http" || c.type == "https") {
             if (c.subdomain) {
-                addFunc("customDomains", `["${c.subdomain}.${j.store.serverAddr}"]`)
+                addFunc("customDomains", [`${c.subdomain}.${j.store.serverAddr}`])
             }
             else if (c.customDomains) {
                 addFunc('customDomains', arrFunc(c.customDomains))
