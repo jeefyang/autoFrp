@@ -17,6 +17,9 @@ export function backupJson2frpcToml(j: BackupDataType) {
     if (!j.store) {
         return
     }
+    let arrFunc = (s: string) => {
+        return `[${s.split(" ").map(c => `"${c}"`).join(",")}]`
+    }
 
     addFunc('serverAddr', j.store.serverAddr)
     addFunc("serverPort", j.store.serverPort)
@@ -72,7 +75,7 @@ export function backupJson2frpcToml(j: BackupDataType) {
                 addFunc("subdomain", c.subdomain)
             }
             else if (c.customDomains) {
-                addFunc('customDomains', `[${c.customDomains.split(" ").map(c => `"${c}"`).join(",")}]`)
+                addFunc('customDomains', arrFunc(c.customDomains))
             }
         }
 
@@ -81,7 +84,9 @@ export function backupJson2frpcToml(j: BackupDataType) {
         }
 
         if (c.type == "http") {
-            addFunc('locations', c.locations)
+            if (c.locations) {
+                addFunc('locations', arrFunc(c.locations))
+            }
             if (c.enableHttpVerify) {
                 addFunc("httpUser", c.httpUser)
                 addFunc("httpPassword", c.httpPassword)
@@ -102,12 +107,12 @@ export function backupJson2frpcToml(j: BackupDataType) {
 
         if (c.type == "stcp") {
             addFunc("secretKey", c.stcpSecretKey)
-            addFunc("allowUsers", `[${c.stcpAllowUsers.split(" ").map(c => `"${c}"`).join(",")}]`)
+            addFunc("allowUsers", arrFunc(c.stcpAllowUsers))
         }
 
         if (c.type == 'xtcp') {
             addFunc("secretKey", c.xtcpSecretKey)
-            addFunc("allowUsers", `[${c.xtcpAllowUsers.split(" ").map(c => `"${c}"`).join(",")}]`)
+            addFunc("allowUsers", arrFunc(c.xtcpAllowUsers))
         }
 
         toml += '\n'

@@ -17,7 +17,7 @@ export function createProxyStore() {
         httpUser: "",
         httpPassword: "",
         enableLocations: false,
-        locations: "locations=/",
+        locations: "",
         subdomain: "",
         customDomains: "",
         enable: false,
