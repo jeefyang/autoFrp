@@ -2,7 +2,7 @@
 import { ref, watch, onMounted, onActivated } from "vue"
 import PopupProxyList from "@/components/PopupProxyList.vue"
 import { createProxyStore, objectAssign } from "@/tool"
-import type { ProxyStoreType } from "@/proxyStore.type";
+import type { ProxyStoreType } from "@/server/proxyStore.type.d";
 import { proxyStore } from "@/proxyStore"
 import { mainStorage } from '@/mainStorage'
 import { showToast, showConfirmDialog, showLoadingToast, showFailToast } from "vant";

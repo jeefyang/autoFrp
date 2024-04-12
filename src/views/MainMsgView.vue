@@ -6,6 +6,7 @@ import { ref } from "vue"
 import EasyPicker from "@/components/EasyPicker.vue"
 import EasyPW from "@/components/EasyPW.vue"
 import EasySwitch from "@/components/EasySwitch.vue"
+import EasyNum from "@/components/EasyNum.vue"
 import { mainStorage } from "@/mainStorage";
 
 const desc = {
@@ -30,8 +31,9 @@ const desc = {
     keyContent: "key密钥内容,保存更新将覆写文件",
     keyUrl: "key密钥路径,将用于内容写入文件里,且代理时默认同步key密钥路径,指的当前客户端所在服务器的路径,如不清楚客户端所在服务器的路径,请不要乱修改",
 
-
 }
+
+
 
 const inactiveColor = "#2b2e30"
 const activeColor = "#1989fa"
@@ -133,10 +135,10 @@ const onSaveCrtFile = async () => {
             <div class="display">
                 <van-cell-group inset>
                     <van-field autosize type="textarea" @click="alertFunc(desc.serverAddr, $event)" rows="1"
-                        right-icon="warning-o" v-model="store.serverAddr" label="服务器地址:" placeholder="请输入服务器地址" />
+                        v-model="store.serverAddr" label="服务器地址:" placeholder="请输入服务器地址" />
 
-                    <van-field autosize type="number" @click="alertFunc(desc.serverPort, $event)" right-icon="warning-o"
-                        v-model="store.serverPort" label="服务器端口:" placeholder="请输入服务器端口" />
+                    <EasyNum @click="alertFunc(desc.serverPort, $event)" v-model="store.serverPort" label="服务器端口:"
+                        placeholder="请输入服务器端口" />
 
                     <EasyPW v-model="store.token" label="令牌:" placeholder="请输入令牌" @labelclick="alertFunc(desc.token)">
                     </EasyPW>
