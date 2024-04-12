@@ -32,10 +32,12 @@ const onSetFrp = async (type: SetFrpType) => {
     ]
     let t = await mainStorage.setFrpByCloud(type)
     if (!t.status) {
-        showToast(l.find(c => c.t == type)?.c || "")
+        showToast(`${l.find(c => c.t == type)?.c || ""} 请求失败`)
         return
     }
+    showToast(`${l.find(c => c.t == type)?.c || ""} 请求成功`)
     t.frpStatus && (frpStatus.value = t.frpStatus)
+
 }
 
 const onStoreReset = () => {
