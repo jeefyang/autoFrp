@@ -454,11 +454,29 @@ const onQrcode = (i: number) => {
     height: 100%;
 }
 
-.wrapper img {
-    max-width: 85%;
-    width: auto;
-    height: auto;
-    min-width: 85%;
+
+@media screen and (orientation: portrait) {
+
+    /*竖屏 css*/
+    .wrapper img {
+        max-width: 85%;
+        width: auto;
+        height: auto;
+        min-width: 85%;
+
+    }
+}
+
+@media screen and (orientation: landscape) {
+
+    /*横屏 css*/
+    .wrapper img {
+        max-height: 85%;
+        width: auto;
+        height: auto;
+        min-height: 85%;
+
+    }
 }
 
 div {
