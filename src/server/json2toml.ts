@@ -100,15 +100,6 @@ export function backupJson2frpcToml(j: BackupDataType) {
             }
         }
 
-        if (c.type == "https") {
-            if (c.enableHttps2http) {
-                addFunc("plugin.localAddr", c.https2httpLocalAddr)
-                addFunc("plugin.hostHeaderRewrite", c.https2httpHostHeaderRewrite)
-                addFunc("plugin.crtPath", c.https2httpCrtpath)
-                addFunc("plugin.keyPath", c.https2httpKeypath)
-            }
-        }
-
         if (c.type == "stcp") {
             addFunc("secretKey", c.stcpSecretKey)
             addFunc("allowUsers", arrFunc(c.stcpAllowUsers))
@@ -117,6 +108,18 @@ export function backupJson2frpcToml(j: BackupDataType) {
         if (c.type == 'xtcp') {
             addFunc("secretKey", c.xtcpSecretKey)
             addFunc("allowUsers", arrFunc(c.xtcpAllowUsers))
+        }
+
+        if (c.type == "https") {
+            if (c.enableHttps2http) {
+                toml += `[proxies.plugin]\n`
+                addFunc('type', "https2http")
+                addFunc("plugin.localAddr", c.https2httpLocalAddr)
+                addFunc("plugin.hostHeaderRewrite", c.https2httpHostHeaderRewrite)
+                addFunc("plugin.crtPath", c.https2httpCrtpath)
+                addFunc("plugin.keyPath", c.https2httpKeypath)
+                addFunc("requestHeaders.set.x-from-where", "frp")
+            }
         }
 
         toml += '\n'

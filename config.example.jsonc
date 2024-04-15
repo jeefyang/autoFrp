@@ -1,8 +1,8 @@
 {
     "listen": 3009,
     "backupFile": "./frp/backup.json",
-    "crtUrl": "./frp/server.crt",
-    "keyUrl": "./frp/server.key",
+    "crtUrl": "./server.crt",
+    "keyUrl": "./server.key",
     "frpcPM2Name": "autoFrp_frpc",
     "frpcTomlName": "./frp/frpc.auto.toml"
 }
