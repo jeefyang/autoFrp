@@ -8,6 +8,7 @@ import EasyPW from "@/components/EasyPW.vue"
 import EasySwitch from "@/components/EasySwitch.vue"
 import EasyNum from "@/components/EasyNum.vue"
 import { mainStorage } from "@/mainStorage";
+import { copyStr } from "@/tool";
 
 const desc = {
     serverAddr: "ServerAddr 指定要连接到的服务器的地址。",
@@ -124,7 +125,24 @@ const onSaveCrtFile = async () => {
         .catch(() => {
             // on cancel
         });
+}
 
+const onCopyCrt = () => {
+    let status = copyStr(store.crtContent)
+    if (status) {
+        showToast("复制证书成功!")
+        return
+    }
+    showToast("复制证书失败!")
+}
+
+const onCopyKey = () => {
+    let status = copyStr(store.keyContent)
+    if (status) {
+        showToast("复制密钥成功!")
+        return
+    }
+    showToast("复制密钥失败!")
 }
 
 </script>
@@ -149,8 +167,8 @@ const onSaveCrtFile = async () => {
                     <van-field autosize type="text" v-model="store.webServerAddr"
                         @click="alertFunc(desc.webServerAddr, $event)" label="管理地址:" placeholder="请输入管理地址" />
 
-                    <EasyNum v-model="store.webServerPort"
-                        @click="alertFunc(desc.webServerPort, $event)" label="管理端口:" placeholder="请输入管理端口" />
+                    <EasyNum v-model="store.webServerPort" @click="alertFunc(desc.webServerPort, $event)" label="管理端口:"
+                        placeholder="请输入管理端口" />
 
                     <van-field autosize type="text" v-model="store.webServerUser"
                         @click="alertFunc(desc.webServerUser, $event)" label="管理用户:" placeholder="请输入管理用户" />
@@ -166,12 +184,11 @@ const onSaveCrtFile = async () => {
                         :inactive-color="inactiveColor" :active-color="activeColor" label="TCP 多路复用:">
                     </EasySwitch>
 
-                    <EasyNum @click="alertFunc(desc.heartbeatInterval, $event)"
-                        right-icon="warning-o" v-model="store.heartbeatInterval" label="心跳包间隔时间:"
-                        placeholder="请输入间隔秒数" />
+                    <EasyNum @click="alertFunc(desc.heartbeatInterval, $event)" right-icon="warning-o"
+                        v-model="store.heartbeatInterval" label="心跳包间隔时间:" placeholder="请输入间隔秒数" />
 
-                    <EasyNum @click="alertFunc(desc.heartbeatTimeout, $event)"
-                        right-icon="warning-o" v-model="store.heartbeatTimeout" label="心跳包超时:" placeholder="请输入超时秒数" />
+                    <EasyNum @click="alertFunc(desc.heartbeatTimeout, $event)" right-icon="warning-o"
+                        v-model="store.heartbeatTimeout" label="心跳包超时:" placeholder="请输入超时秒数" />
 
                     <EasyPicker @labelclick="alertFunc(desc.loglevel)" v-model="store.loglevel" label="日志等级:"
                         :columns='["error", "info", "trace", "debug", "warn"]'>
@@ -201,6 +218,8 @@ const onSaveCrtFile = async () => {
                     <div>
                         <van-button class="btn" type="default" @click="onLoadCrtFile">云端读取证书</van-button>
                         <van-button class="btn" type="default" @click="onSaveCrtFile">云端保存证书</van-button>
+                        <van-button class="btn" type="default" @click="onCopyCrt">复制证书</van-button>
+                        <van-button class="btn" type="default" @click="onCopyKey">复制密钥</van-button>
                     </div>
 
                 </van-cell-group>

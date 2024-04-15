@@ -8,6 +8,7 @@ import { mainStorage } from '@/mainStorage'
 import { showToast, showConfirmDialog, showLoadingToast, showFailToast } from "vant";
 import { store } from "@/store";
 import { otherStore } from "@/otherStore";
+import qrcode from "qrcode"
 
 
 const showEdit = ref(false)
@@ -189,6 +190,19 @@ const onApplyUpdate = async () => {
 
 }
 
+const onQrcode = (i:number) => {
+    qrcode.toDataURL(getProxyDomain(i), function (err: any, url: string) {
+        showToast({
+            icon: url,
+            message: "跳转路径",
+            iconSize: "100px",
+            overlay: true,
+            closeOnClick: true,
+            duration: 0,
+        })
+    });
+}
+
 </script>
 <template>
 
@@ -203,6 +217,7 @@ const onApplyUpdate = async () => {
                 <template v-for="(child, index) in  proxyStore">
                     <div class="pos" v-if="checkSearchKey(index, searchKey)">
                         <van-cell-group :style="{ 'width': '100%' }">
+                            <!-- 上层 -->
                             <div class="row rowbig">
                                 <div class="row posleft">
                                     <van-icon :name="child.enable ? 'play-circle' : 'stop-circle'"
@@ -215,7 +230,9 @@ const onApplyUpdate = async () => {
                                     <div :style="{ 'color': orangeColor, 'font-size': fontSize }">{{ child.localIP }}
                                     </div>
                                     <div :style="{ 'font-size': fontSize }">:</div>
-                                    <div :style="{ 'color': blueColor, 'font-size': fontSize }">{{ child.remotePort }}
+                                    <div :style="{ 'color': blueColor, 'font-size': fontSize }">{{
+                        child.type == "http" ? store.vhostHTTPPort : child.type == "https" ?
+                            store.vhostHTTPSPort : child.remotePort }}
                                     </div>
                                     <div :style="{ 'color': orangeColor, 'font-size': fontSize }">{{ child.type }}</div>
                                 </div>
@@ -227,23 +244,35 @@ const onApplyUpdate = async () => {
                                     </div>
                                 </div>
                             </div>
+                            <!-- 下层 -->
                             <div class="row rowbig">
                                 <div class="row posleft">
+                                    <!-- 跳转 -->
                                     <van-icon name="arrow" :class="child.enable ? 'enableLight' : 'disableLight'"
                                         :size="size" @click="onjumpProxy(index)"></van-icon>
+
                                 </div>
                                 <div class="row poscenter">
-                                    <div :style="{ 'color': blueColor, 'font-size': fontSize }"
+
+                                    <div class="urlleft" :style="{ 'color': blueColor, 'font-size': fontSize }"
                                         @click="onCopyProxyUrl(index)">{{
                         getProxyDomain(index) }}</div>
-                                    <div :style="{ 'color': child.useEncryption ? greenColor : redColor, 'font-size': fontSize }"
-                                        @click="onEditProxyEncryption(index)">
-                                        加密
+                                    <div class="toolright">
+                                        <!-- 二维码 -->
+                                        <van-icon name="qr" :size="size" @click="onQrcode(index)"></van-icon>
+                                        <div>
+                                            <div :style="{ 'color': child.useEncryption ? greenColor : redColor, 'font-size': fontSize }"
+                                                @click="onEditProxyEncryption(index)">
+                                                加密
+                                            </div>
+                                            <div :style="{ 'color': child.useCompression ? greenColor : redColor, 'font-size': fontSize }"
+                                                @click="onEditProxyCompression(index)">
+                                                压缩
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div :style="{ 'color': child.useCompression ? greenColor : redColor, 'font-size': fontSize }"
-                                        @click="onEditProxyCompression(index)">
-                                        压缩
-                                    </div>
+
+
                                 </div>
                                 <div class="row posright">
                                     <div>
@@ -341,5 +370,30 @@ const onApplyUpdate = async () => {
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
+}
+
+.col {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.urlleft {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    width: 78%;
+    word-break: break-all;
+
+}
+
+.toolright {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    width: 20%;
 }
 </style>@/server/proxyStore.type
