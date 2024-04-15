@@ -41,7 +41,7 @@ const desc = {
     hostHeaderRewrite: "是否重新修改 host header",
     enableHostHeaderRewrite: "The Host header will be rewritten to match the hostname portion of the forwarding address.",
     enableHttps2http: "使用插件使用插件模式时，本地 IP 地址和端口无需配置，插件将会处理来自服务端的链接请求。",
-    https2httpLocalAddr: "插件本地地址（格式 IP:Port）",
+    https2httpLocalAddr: "插件本地地址（格式 IP:Port,如127.0.0.1:80）,不写默认取(localIP:localPort)",
     https2httpCrtpath: "插件证书路径,位置相对于frpc程序",
     https2httpKeypath: "插件私钥路径,位置相对于frpc程序",
     https2httpHostHeaderRewrite: "插件 Host Header 重写",

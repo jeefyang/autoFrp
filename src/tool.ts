@@ -24,7 +24,7 @@ export function createProxyStore() {
         localIP: "127.0.0.1",
         localPort: 80,
         enableHttps2http: false,
-        https2httpLocalAddr: "127.0.0.1:80",
+        https2httpLocalAddr: "",
         https2httpCrtpath: store.crtUrl,
         https2httpKeypath: store.keyUrl,
         https2httpHostHeaderRewrite: "127.0.0.1",
