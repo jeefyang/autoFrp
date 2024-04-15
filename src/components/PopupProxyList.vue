@@ -91,15 +91,15 @@ const alertFunc = (s: string, e?: MouseEvent,) => {
             </EasyPicker>
             <van-field autosize type="text" v-model="data.localIP" @click="alertFunc(desc.localIP, $event)"
                 label="内网ip:" placeholder="请输入内网ip" />
-            <EasyNum v-model="data.localPort" @click="alertFunc(desc.localPort, $event)"
-                label="ip端口:" placeholder="请输入端口号" />
+            <EasyNum v-model="data.localPort" @click="alertFunc(desc.localPort, $event)" label="ip端口:"
+                placeholder="请输入端口号" />
             <template v-if="data.type == 'tcp'">
-                <EasyNum v-model="data.remotePort" @click="alertFunc(desc.remotePort, $event)"
-                    label="远程端口:" placeholder="请输入端口号" />
+                <EasyNum v-model="data.remotePort" @click="alertFunc(desc.remotePort, $event)" label="远程端口:"
+                    placeholder="请输入端口号" />
             </template>
             <template v-if="data.type == 'udp'">
-                <EasyNum v-model="data.remotePort" @click="alertFunc(desc.remotePort, $event)"
-                    label="远程端口:" placeholder="请输入端口号" />
+                <EasyNum v-model="data.remotePort" @click="alertFunc(desc.remotePort, $event)" label="远程端口:"
+                    placeholder="请输入端口号" />
             </template>
             <template v-if="data.type == 'http'">
                 <van-field autosize type="text" v-model="data.subdomain" @click="alertFunc(desc.subdomain, $event)"
