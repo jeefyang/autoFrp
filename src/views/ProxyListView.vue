@@ -158,9 +158,9 @@ const onJumpLocal = (i: number) => {
     let c = proxyStore[i]
     let url = `${c.localIP}:${c.localPort}`
     showConfirmDialog({
-        title: `确定跳转 ${url}`,
+        title: `跳转`,
         message:
-            '跳转',
+            `确定跳转 ${url}`,
     })
         .then(() => {
             try {
