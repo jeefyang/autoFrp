@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onActivated } from "vue"
 import PopupProxyList from "@/components/PopupProxyList.vue"
-import { createProxyStore, objectAssign } from "@/tool"
+import { copyStr, createProxyStore, objectAssign } from "@/tool"
 import type { ProxyStoreType } from "@/server/proxyStore.type.d";
 import { proxyStore } from "@/proxyStore"
 import { mainStorage } from '@/mainStorage'
@@ -15,6 +15,8 @@ const showEdit = ref(false)
 const proxySite = ref(<number>-2)
 const proxyData = ref(createProxyStore())
 const searchKey = ref(<string>"")
+const showQrcode = ref(<boolean>false)
+const qrcodeImg = ref(<string>"")
 let backupProxyData!: ProxyStoreType
 
 const redColor = "#ee0a24"
@@ -129,13 +131,19 @@ const onDeleteProxy = (i: number) => {
 
 const onCopyProxyUrl = (i: number) => {
     let url = getProxyDomain(i)
-    navigator.clipboard.writeText(url).then(() => {
+    let status = copyStr(url)
+    if (status) {
         showToast(`复制 ${url} 到剪切板`)
-    })
+        return
+    }
+    showToast(`无法复制 ${url} 到剪切板`)
+    // navigator.clipboard.writeText(url).then(() => {
+    //     showToast(`复制 ${url} 到剪切板`)
+    // })
 
 }
 
-const onjumpProxy = (i: number) => {
+const onJumpProxy = (i: number) => {
     // console.log("跳转")
     showToast(`即将跳转 ${getProxyDomain(i)}`)
     try {
@@ -144,6 +152,30 @@ const onjumpProxy = (i: number) => {
     catch {
         showFailToast({ message: `无法跳转到 ${getProxyDomain(i)}` })
     }
+}
+
+const onJumpLocal = (i: number) => {
+    let c = proxyStore[i]
+    let url = `${c.localIP}:${c.localPort}`
+    showConfirmDialog({
+        title: `确定跳转 ${url}`,
+        message:
+            '跳转',
+    })
+        .then(() => {
+            try {
+                window.open(url)
+            }
+            catch {
+                showFailToast({ message: `无法跳转到 ${url}` })
+            }
+
+            // on confirm
+        })
+        .catch(() => {
+
+            // on cancel
+        });
 }
 
 const onconfirmChild = () => {
@@ -190,16 +222,10 @@ const onApplyUpdate = async () => {
 
 }
 
-const onQrcode = (i:number) => {
+const onQrcode = (i: number) => {
     qrcode.toDataURL(getProxyDomain(i), function (err: any, url: string) {
-        showToast({
-            icon: url,
-            message: "跳转路径",
-            iconSize: "100px",
-            overlay: true,
-            closeOnClick: true,
-            duration: 0,
-        })
+        qrcodeImg.value = url
+        showQrcode.value = true
     });
 }
 
@@ -220,23 +246,40 @@ const onQrcode = (i:number) => {
                             <!-- 上层 -->
                             <div class="row rowbig">
                                 <div class="row posleft">
+                                    <!-- 运行图标 -->
                                     <van-icon :name="child.enable ? 'play-circle' : 'stop-circle'"
                                         @click="onEditProxyEnable(index)"
                                         :class="child.enable ? 'enableLight' : 'disableLight'" :size="size"></van-icon>
                                 </div>
                                 <div class="row poscenter">
-                                    <div :style="{ 'color': blueColor, 'font-size': fontSize }">{{ child.name }}
+                                    <div class="urlleft">
+                                        <div>
+                                            <!-- frpc名称 -->
+                                            <div :style="{ 'color': orangeColor, 'font-size': fontSize }">{{ child.name
+                                                }}
+                                            </div>
+                                            <!-- 代理路径 -->
+                                            <div :style="{ 'color': orangeColor, 'font-size': fontSize }"
+                                                @dblclick="onJumpLocal(index)">{{
+                        child.localIP
+                    }}:{{ child.localPort }}</div>
+                                        </div>
                                     </div>
-                                    <div :style="{ 'color': orangeColor, 'font-size': fontSize }">{{ child.localIP }}
-                                    </div>
-                                    <div :style="{ 'font-size': fontSize }">:</div>
-                                    <div :style="{ 'color': blueColor, 'font-size': fontSize }">{{
+                                    <div class="toolright">
+                                        <div>
+                                            <div :style="{ 'color': orangeColor, 'font-size': fontSize }">{{ child.type
+                                                }}
+                                            </div>
+                                            <div :style="{ 'color': orangeColor, 'font-size': fontSize }">{{
                         child.type == "http" ? store.vhostHTTPPort : child.type == "https" ?
                             store.vhostHTTPSPort : child.remotePort }}
-                                    </div>
-                                    <div :style="{ 'color': orangeColor, 'font-size': fontSize }">{{ child.type }}</div>
-                                </div>
+                                            </div>
 
+                                        </div>
+
+                                    </div>
+
+                                </div>
                                 <div class="row posright">
                                     <div>
                                         <van-button class="btn" type="primary"
@@ -247,13 +290,13 @@ const onQrcode = (i:number) => {
                             <!-- 下层 -->
                             <div class="row rowbig">
                                 <div class="row posleft">
-                                    <!-- 跳转 -->
+                                    <!-- 跳转图标 -->
                                     <van-icon name="arrow" :class="child.enable ? 'enableLight' : 'disableLight'"
-                                        :size="size" @click="onjumpProxy(index)"></van-icon>
+                                        :size="size" @click="onJumpProxy(index)"></van-icon>
 
                                 </div>
                                 <div class="row poscenter">
-
+                                    <!-- 跳转url -->
                                     <div class="urlleft" :style="{ 'color': blueColor, 'font-size': fontSize }"
                                         @click="onCopyProxyUrl(index)">{{
                         getProxyDomain(index) }}</div>
@@ -261,10 +304,12 @@ const onQrcode = (i:number) => {
                                         <!-- 二维码 -->
                                         <van-icon name="qr" :size="size" @click="onQrcode(index)"></van-icon>
                                         <div>
+                                            <!-- 加密 -->
                                             <div :style="{ 'color': child.useEncryption ? greenColor : redColor, 'font-size': fontSize }"
                                                 @click="onEditProxyEncryption(index)">
                                                 加密
                                             </div>
+                                            <!-- 压缩 -->
                                             <div :style="{ 'color': child.useCompression ? greenColor : redColor, 'font-size': fontSize }"
                                                 @click="onEditProxyCompression(index)">
                                                 压缩
@@ -301,6 +346,11 @@ const onQrcode = (i:number) => {
     </div>
     <PopupProxyList v-model:show="showEdit" :data="proxyData" @onreset="onresetChild" @onconfirm="onconfirmChild">
     </PopupProxyList>
+    <van-overlay :show="showQrcode" @click="showQrcode = false">
+        <div class="wrapper">
+            <img :src="qrcodeImg" />
+        </div>
+    </van-overlay>
 </template>
 <style scoped>
 .big {
@@ -395,5 +445,23 @@ const onQrcode = (i:number) => {
     justify-content: space-around;
     align-items: center;
     width: 20%;
+}
+
+.wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.wrapper img {
+    max-width: 85%;
+    width: auto;
+    height: auto;
+    min-width: 85%;
+}
+
+div {
+    text-align: center;
 }
 </style>@/server/proxyStore.type

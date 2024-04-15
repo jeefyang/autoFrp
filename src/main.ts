@@ -3,7 +3,7 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
-import {Switch,Popup,Picker, Button, Tabbar, TabbarItem, ConfigProvider,Grid, GridItem,Icon,Field, CellGroup,Dialog,Overlay,Loading   } from 'vant';
+import { Switch, Popup, Picker, Button, Tabbar, TabbarItem, ConfigProvider, Grid, GridItem, Icon, Field, CellGroup, Dialog, Overlay, Loading } from 'vant';
 import 'vant/lib/index.css';
 
 const app = createApp(App)
