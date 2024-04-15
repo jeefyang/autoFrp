@@ -384,11 +384,11 @@ const onQrcode = (i: number) => {
 }
 
 .posleft {
-    width: 5%;
+    width: 15%;
 }
 
 .poscenter {
-    width: 80%
+    width: 70%
 }
 
 .posright {
@@ -434,7 +434,7 @@ const onQrcode = (i: number) => {
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
-    width: 78%;
+    width: 70%;
     word-break: break-all;
 
 }
@@ -444,7 +444,7 @@ const onQrcode = (i: number) => {
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
-    width: 20%;
+    width: 25%;
 }
 
 .wrapper {
