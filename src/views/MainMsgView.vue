@@ -66,7 +66,13 @@ const onApply = () => {
             let status = await mainStorage.applyStoreByCloud()
             loading.close()
             if (status) {
-                showToast("应用更新成功")
+                showConfirmDialog({
+                    title: `更新成功`,
+                    message:
+                        '应用更新成功,需要保存数据到本地?',
+                }).then(() => {
+                    onSave()
+                })
                 return
             }
             showToast("应用更新失败!!!")

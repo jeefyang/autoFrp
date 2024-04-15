@@ -178,7 +178,7 @@ const onJumpLocal = (i: number) => {
         });
 }
 
-const onconfirmChild = () => {
+const onConfirmChild = () => {
     if (proxySite.value == -1) {
         proxyStore.push(objectAssign(proxyData.value))
     }
@@ -190,11 +190,11 @@ const onconfirmChild = () => {
     console.log(proxyStore)
 }
 
-const onresetChild = () => {
+const onResetChild = () => {
     proxyData.value = objectAssign(backupProxyData)
 }
 
-const onsave = () => {
+const onSave = () => {
     mainStorage.saveProxyStoreByLocalStorage()
     showToast("已经保存到localstorage")
 }
@@ -210,7 +210,13 @@ const onApplyUpdate = async () => {
             let status = await mainStorage.applyProxyStoreByCloud()
             loading.close()
             if (status) {
-                showToast("应用更新成功")
+                showConfirmDialog({
+                    title: `更新成功`,
+                    message:
+                        '应用更新成功,需要保存数据到本地?',
+                }).then(() => {
+                    onSave()
+                })
                 return
             }
             showToast("应用更新失败!!!")
@@ -337,14 +343,14 @@ const onQrcode = (i: number) => {
             <div class="pos">
                 <van-button class="btn" type="primary" @click="onAddProxy">添加代理</van-button>
                 <van-button class="btn" type="primary" @click="onApplyUpdate">应用更新</van-button>
-                <van-button class="btn" type="primary" @click="onsave">保存本地</van-button>
+                <van-button class="btn" type="primary" @click="onSave">保存本地</van-button>
                 <!-- <van-button class="btn" type="primary">重置当前</van-button>
                 <van-button class="btn" type="primary">读取云端</van-button>
                 <van-button class="btn" type="primary">清空本地</van-button> -->
             </div>
         </div>
     </div>
-    <PopupProxyList v-model:show="showEdit" :data="proxyData" @onreset="onresetChild" @onconfirm="onconfirmChild">
+    <PopupProxyList v-model:show="showEdit" :data="proxyData" @onreset="onResetChild" @onconfirm="onConfirmChild">
     </PopupProxyList>
     <van-overlay :show="showQrcode" @click="showQrcode = false">
         <div class="wrapper">
