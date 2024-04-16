@@ -17,15 +17,26 @@ const emit = defineEmits<{
     (e: "onreset"): void
 }>()
 
-const onchangeType = () => {
-    console.log("改变插件类型")
-    props.data.pluginType = 'none'
+onMounted(() => {
+    watch([() => props.data], () => {
+        console.log("数据更新了")
+        onupdateShowPluginType()
+    })
+})
+
+const onupdateShowPluginType = () => {
     if (props.data.type == "https") {
         showPluginType.value = ['none', "https2http", "https2https"]
     }
     else {
         showPluginType.value = ['none']
     }
+}
+
+const onchangeType = () => {
+    console.log("改变插件类型")
+    props.data.pluginType = 'none'
+    onupdateShowPluginType()
 }
 
 const onconfirm = () => {
