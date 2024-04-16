@@ -8,13 +8,25 @@ import EasyPW from "./EasyPW.vue"
 import { showToast } from "vant"
 
 const showTop = ref(false)
-defineProps<{
+const showPluginType = ref(<ProxyStoreType['pluginType'][]>['none'])
+const props = defineProps<{
     data: ProxyStoreType
 }>()
 const emit = defineEmits<{
     (e: "onconfirm"): void
     (e: "onreset"): void
 }>()
+
+const onchangeType = () => {
+    console.log("改变插件类型")
+    props.data.pluginType = 'none'
+    if (props.data.type == "https") {
+        showPluginType.value = ['none', "https2http", "https2https"]
+    }
+    else {
+        showPluginType.value = ['none']
+    }
+}
 
 const onconfirm = () => {
     emit("onconfirm")
@@ -40,11 +52,11 @@ const desc = {
     locations: "Http requests with url prefix /news will be forwarded to this service.",
     hostHeaderRewrite: "是否重新修改 host header",
     enableHostHeaderRewrite: "The Host header will be rewritten to match the hostname portion of the forwarding address.",
-    enableHttps2http: "使用插件使用插件模式时，本地 IP 地址和端口无需配置，插件将会处理来自服务端的链接请求。",
-    https2httpLocalAddr: "插件本地地址（格式 IP:Port,如127.0.0.1:80）,不写默认取(localIP:localPort)",
-    https2httpCrtpath: "插件证书路径,位置相对于frpc程序",
-    https2httpKeypath: "插件私钥路径,位置相对于frpc程序",
-    https2httpHostHeaderRewrite: "插件 Host Header 重写",
+    pluginType: "插件类型:\n https对应:https2http,https2https",
+    pluginLocalAddr: "插件本地地址（格式 IP:Port,如127.0.0.1:80）,不写默认取(localIP:localPort)",
+    pluginCrtPath: "插件证书路径,位置相对于frpc程序",
+    pluginKeyPath: "插件私钥路径,位置相对于frpc程序",
+    pluginHostHeaderRewrite: "插件 Host Header 重写",
     stcpSecretKey: "stcp密钥，服务端和访问端的密钥需要一致，访问端才能访问到服务端",
     stcpAllowUsers: "允许访问的 visitor 用户列表，默认只允许同一用户下的 visitor 访问，配置为 * 则允许任何 visitor 访问,用空格隔开",
     xtcpSecretKey: "xtcp密钥，服务端和访问端的密钥需要一致，访问端才能访问到服务端",
@@ -86,7 +98,7 @@ const alertFunc = (s: string, e?: MouseEvent,) => {
             </EasySwitch>
             <van-field autosize type="text" v-model="data.name" @click="alertFunc(desc.name, $event)" label="备注名:"
                 placeholder="请输入备注名" />
-            <EasyPicker @labelclick="alertFunc(desc.type)" v-model="data.type" label="代理协议:"
+            <EasyPicker @labelclick="alertFunc(desc.type)" v-model="data.type" label="代理协议:" @changeval="onchangeType"
                 :columns='["tcp", "http", "https", "udp", "stcp", "xtcp"]'>
             </EasyPicker>
             <van-field autosize type="text" v-model="data.localIP" @click="alertFunc(desc.localIP, $event)"
@@ -136,21 +148,18 @@ const alertFunc = (s: string, e?: MouseEvent,) => {
                     label="子域名:" placeholder="请输入子域名" />
                 <van-field autosize type="text" v-model="data.customDomains"
                     @click="alertFunc(desc.customDomains, $event)" label="自定义域名:" placeholder="请输入自定义域名" />
-                <EasySwitch @labelclick="alertFunc(desc.enableHttps2http)" v-model="data.enableHttps2http"
-                    :inactive-color="inactiveColor" :active-color="activeColor" label="https2http:">
-                </EasySwitch>
-                <template v-if="data.enableHttps2http">
-                    <van-field autosize type="text" v-model="data.https2httpLocalAddr"
-                        @click="alertFunc(desc.https2httpLocalAddr, $event)" label="本地地址:" placeholder="请输入地址" />
-                    <van-field autosize type="text" v-model="data.https2httpCrtpath"
-                        @click="alertFunc(desc.https2httpCrtpath, $event)" label="插件crt证书路径:"
-                        placeholder="请输入插件crt证书路径" />
-                    <van-field autosize type="text" v-model="data.https2httpKeypath"
-                        @click="alertFunc(desc.https2httpKeypath, $event)" label="插件key密钥路径:"
-                        placeholder="请输入插件key密钥路径" />
+                <EasyPicker v-if="data.type == 'https'" label="插件类型:" v-model="data.pluginType"
+                    :columns="showPluginType" @labelclick="alertFunc(desc.pluginType)"></EasyPicker>
+                <template v-if="data.pluginType == 'https2http' || data.pluginType == 'https2https'">
+                    <van-field autosize type="text" v-model="data.pluginLocalAddr"
+                        @click="alertFunc(desc.pluginLocalAddr, $event)" label="本地地址:" placeholder="请输入地址" />
+                    <van-field autosize type="text" v-model="data.pluginCrtPath"
+                        @click="alertFunc(desc.pluginCrtPath, $event)" label="插件crt证书路径:" placeholder="请输入插件crt证书路径" />
+                    <van-field autosize type="text" v-model="data.pluginKeyPath"
+                        @click="alertFunc(desc.pluginKeyPath, $event)" label="插件key密钥路径:" placeholder="请输入插件key密钥路径" />
 
-                    <van-field autosize type="text" v-model="data.https2httpHostHeaderRewrite"
-                        @click="alertFunc(desc.https2httpHostHeaderRewrite, $event)" label="插件Host Header 重写:"
+                    <van-field autosize type="text" v-model="data.pluginHostHeaderRewrite"
+                        @click="alertFunc(desc.pluginHostHeaderRewrite, $event)" label="插件Host Header 重写:"
                         placeholder="请输入Host Header" />
                 </template>
             </template>

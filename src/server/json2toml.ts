@@ -111,13 +111,13 @@ export function backupJson2frpcToml(j: BackupDataType) {
         }
 
         if (c.type == "https") {
-            if (c.enableHttps2http) {
+            if (c.pluginType != "none") {
                 toml += `[proxies.plugin]\n`
-                addFunc('type', "https2http")
-                addFunc("localAddr", c.https2httpLocalAddr || `${c.localIP}:${c.localPort}`)
-                addFunc("hostHeaderRewrite", c.https2httpHostHeaderRewrite)
-                addFunc("crtPath", c.https2httpCrtpath)
-                addFunc("keyPath", c.https2httpKeypath)
+                addFunc('type', c.pluginType)
+                addFunc("localAddr", c.pluginLocalAddr || `${c.localIP}:${c.localPort}`)
+                addFunc("hostHeaderRewrite", c.pluginHostHeaderRewrite)
+                addFunc("crtPath", c.pluginCrtPath)
+                addFunc("keyPath", c.pluginKeyPath)
                 addFunc("requestHeaders.set.x-from-where", "frp")
             }
         }

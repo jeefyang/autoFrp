@@ -4,7 +4,8 @@ import { ref, defineModel, defineProps, defineEmits, onMounted } from 'vue'
 const showPicker = ref(false)
 const model = defineModel<any>({ required: true })
 const emit = defineEmits<{
-    (e: 'labelclick'): void
+    (e: 'labelclick'): void,
+    (e: 'changeval'): void
 }>()
 const props = defineProps<{
     columns: string[]
@@ -16,6 +17,7 @@ const onConfirm = (d: { selectedValues: string[] }) => {
     showPicker.value = false
     console.log(d.selectedValues)
     model.value = d.selectedValues[0]
+    emit("changeval")
 }
 
 const columnsFunc = () => {

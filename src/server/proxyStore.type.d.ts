@@ -33,16 +33,16 @@ export type ProxyStoreType = {
     localIP: string
     /** 被代理的本地服务端口 */
     localPort: number
-    /** 是否启动https2http插件 */
-    enableHttps2http: boolean
-    /** 本地 HTTPS 服务地址,可包含端口 */
-    https2httpLocalAddr: string
-    /** TLS 证书文件路径 */
-    https2httpCrtpath: string
-    /** TLS 密钥文件路径 */
-    https2httpKeypath: string
-    /** 替换 Host header */
-    https2httpHostHeaderRewrite: string
+    /** 插件类型 */
+    pluginType: "none" | "https2http" | "https2https"
+    /** 本地 HTTPS 服务地址,可包含端口(插件) */
+    pluginLocalAddr: string
+    /** TLS 证书文件路径(插件) */
+    pluginCrtPath: string
+    /** TLS 密钥文件路径(插件) */
+    pluginKeyPath: string
+    /** 替换 Host header(插件) */
+    pluginHostHeaderRewrite: string
     /** 是否替换 Host Header */
     enableHostHeaderRewrite: boolean
     /** 替换 Host Header */
