@@ -3,6 +3,8 @@ import { ref, defineModel, defineProps, defineEmits, onMounted } from 'vue'
 
 const showPicker = ref(false)
 const model = defineModel<any>({ required: true })
+
+const defaultData = ref(<string[]>[])
 const emit = defineEmits<{
     (e: 'labelclick'): void,
     (e: 'changeval'): void
@@ -25,19 +27,10 @@ const columnsFunc = () => {
 }
 
 const onClick = (e: MouseEvent) => {
-    let t = <HTMLElement>(e.target)
-    if (t.tagName != "LABEL") {
-        showPicker.value = true
-        return
-    }
-    emit("labelclick")
-}
-
-const defaultData = ref(<string[]>[])
 
 
-onMounted(() => {
     let list = [...props.columns]
+    console.log(model.value)
     defaultData.value = list.sort((a, b) => {
         if (a == model.value) {
             return -1
@@ -47,6 +40,21 @@ onMounted(() => {
         }
         return 0
     })
+
+    let t = <HTMLElement>(e.target)
+    if (t.tagName != "LABEL") {
+        showPicker.value = true
+        return
+    }
+
+    emit("labelclick")
+}
+
+
+
+onMounted(() => {
+
+
 })
 
 </script>
