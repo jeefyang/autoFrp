@@ -199,6 +199,22 @@ const onSave = () => {
     showToast("已经保存到localstorage")
 }
 
+const onVerify = async () => {
+    let loading = showLoadingToast({ message: "应用校验中", overlay: true, forbidClick: true, duration: 0 })
+    let res = await mainStorage.verifyDataByCloud("proxyListStore")
+    loading.close()
+    if (res.verifyStaus == "success") {
+        showToast("校验成功!")
+        return
+    }
+    else if (res.verifyStaus == "tomlErr") {
+        showToast("数据转换toml后,frpc识别错误,请修正再校验")
+    }
+    else {
+        showToast("应用更新失败!!!")
+    }
+}
+
 const onApplyUpdate = async () => {
     showConfirmDialog({
         title: `应用更新`,
@@ -207,9 +223,9 @@ const onApplyUpdate = async () => {
     })
         .then(async () => {
             let loading = showLoadingToast({ message: "应用更新中", overlay: true, forbidClick: true, duration: 0 })
-            let status = await mainStorage.applyProxyStoreByCloud()
+            let res = await mainStorage.applyDataByCloud("proxyListStore")
             loading.close()
-            if (status) {
+            if (res.status) {
                 showConfirmDialog({
                     title: `更新成功`,
                     message:
@@ -219,7 +235,14 @@ const onApplyUpdate = async () => {
                 })
                 return
             }
-            showToast("应用更新失败!!!")
+            else {
+                if (res.verifyStaus == "tomlErr") {
+                    showToast("数据转换toml后,frpc识别错误,请修正再更新")
+                }
+                else {
+                    showToast("应用更新失败!!!")
+                }
+            }
 
         })
         .catch(() => {
@@ -246,7 +269,7 @@ const onQrcode = (i: number) => {
                     <!-- 输入任意文本 -->
                     <van-field v-model="searchKey" label="搜索:" placeholder="请输入关键字搜索" />
                 </van-cell-group>
-                <template v-for="(child, index) in  proxyStore">
+                <template v-for="(child, index) in proxyStore">
                     <div class="pos" v-if="checkSearchKey(index, searchKey)">
                         <van-cell-group :style="{ 'width': '100%' }">
                             <!-- 上层 -->
@@ -267,8 +290,8 @@ const onQrcode = (i: number) => {
                                             <!-- 代理路径 -->
                                             <div :style="{ 'color': orangeColor, 'font-size': fontSize }"
                                                 @dblclick="onJumpLocal(index)">{{
-                        child.localIP
-                    }}:{{ child.localPort }}</div>
+                                                    child.localIP
+                                                }}:{{ child.localPort }}</div>
                                         </div>
                                     </div>
                                     <div class="toolright">
@@ -277,8 +300,8 @@ const onQrcode = (i: number) => {
                                                 }}
                                             </div>
                                             <div :style="{ 'color': orangeColor, 'font-size': fontSize }">{{
-                        child.type == "http" ? store.vhostHTTPPort : child.type == "https" ?
-                            store.vhostHTTPSPort : child.remotePort }}
+                                                child.type == "http" ? store.vhostHTTPPort : child.type == "https" ?
+                                                    store.vhostHTTPSPort : child.remotePort }}
                                             </div>
 
                                         </div>
@@ -305,7 +328,7 @@ const onQrcode = (i: number) => {
                                     <!-- 跳转url -->
                                     <div class="urlleft" :style="{ 'color': blueColor, 'font-size': fontSize }"
                                         @click="onCopyProxyUrl(index)">{{
-                        getProxyDomain(index) }}</div>
+                                            getProxyDomain(index) }}</div>
                                     <div class="toolright">
                                         <!-- 二维码 -->
                                         <van-icon name="qr" :size="size" @click="onQrcode(index)"></van-icon>
@@ -342,6 +365,7 @@ const onQrcode = (i: number) => {
         <div class="buttomDiv">
             <div class="pos">
                 <van-button class="btn" type="primary" @click="onAddProxy">添加代理</van-button>
+                <van-button class="btn" type="primary" @click="onVerify">数据校验</van-button>
                 <van-button class="btn" type="primary" @click="onApplyUpdate">应用更新</van-button>
                 <van-button class="btn" type="primary" @click="onSave">保存本地</van-button>
                 <!-- <van-button class="btn" type="primary">重置当前</van-button>

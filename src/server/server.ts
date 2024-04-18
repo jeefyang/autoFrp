@@ -1,10 +1,10 @@
 import express from "express"
 import cors from "cors"
 import mime from "mime"
-import fs from "fs"
+import fs, { stat } from "fs"
 import path from "path"
 import bodyparser from "body-parser"
-import type { ConfigType, BackupDataType, FrpStatusType, SetFrpType, FrpStatusSendType, SetFrpSendType } from "./type.d"
+import type { ConfigType, BackupDataType, FrpStatusType, SetFrpType, FrpStatusSendType, SetFrpSendType, VerifyTomlType, ApplyTomlStatusType } from "./type.d"
 import { execSync } from "child_process"
 import shell from "shelljs"
 import { backupJson2frpcToml } from "./json2toml"
@@ -25,6 +25,10 @@ if (!fs.existsSync(jsonUrl)) {
 const jsonStr = fs.readFileSync(jsonUrl, "utf-8")
 const configjson: ConfigType = eval(`(${jsonStr})`)
 
+const testTomlUrl = "./frpc.test.toml"
+const frpDir = "./frp"
+const frpcExe = './frp/extract/frpc'
+
 console.log(configjson)
 
 console.log(`环境为:${import.meta.env.MODE}`)
@@ -37,7 +41,7 @@ console.log(`环境为:${import.meta.env.MODE}`)
 
 const vue_Router_list: string[] = ["/", "/list", "/other", "/home"]
 
-let getFrpStatus = () => {
+const getFrpStatus = () => {
     let out = shell.exec("pm2 ls").stdout
     let list = out.split('\n')
     let status: FrpStatusType = "null"
@@ -57,6 +61,34 @@ let getFrpStatus = () => {
     return status
 }
 
+const verifyToml = (s: string) => {
+    let status: VerifyTomlType = "noneErr"
+    if (!s) {
+        return status
+    }
+    try {
+        fs.writeFileSync(testTomlUrl, s, "utf-8")
+    }
+    catch {
+        status = "fileErr"
+        return status
+    }
+    try {
+        let out = shell.exec(`${frpcExe} verify -c ${testTomlUrl}`, { cwd: "./" }).stdout
+        if (out.indexOf("syntax is ok") == -1) {
+            status = "fileErr"
+        }
+        else {
+            status = 'success'
+        }
+    }
+    catch {
+        status = "exeErr"
+    }
+    return status
+
+}
+
 app.get("/frpStatus", async (req, res) => {
     let status = getFrpStatus()
     let j: FrpStatusSendType = { status }
@@ -73,7 +105,7 @@ app.get("/setFrp", async (req, res) => {
         res.send(JSON.stringify({ status }))
         return
     }
-    let out = shell.exec(`pm2 ${act} ./pm2.frpc.jsonc`, { cwd: "./frp" }).stdout
+    let out = shell.exec(`pm2 ${act} ./pm2.frpc.jsonc`, { cwd: frpDir }).stdout
     status = true
     let frpStatus = getFrpStatus()
     let j: SetFrpSendType = {
@@ -145,17 +177,58 @@ const saveStoreFunc = (o: any) => {
     return d
 }
 
-app.post("/saveStore", async (req, res) => {
-    saveStoreFunc(req.body)
-    res.send("saveStore success!!!")
+app.post("/saveData", async (req, res) => {
+    let u = new URL(`http://localhost${req.url}`)
+    let d: BackupDataType = {}
+    if (u.searchParams.has("store")) {
+        d = getNewBackupData({ store: req.res })
+    }
+    else if (u.searchParams.has("proxyListStore")) {
+        d = getNewBackupData({ proxyListStore: req.res })
+    }
+    fs.writeFileSync(configjson.backupFile, JSON.stringify(d), "utf-8")
+    res.send(JSON.stringify({ status: true }))
     return
 })
 
-app.post("/applyStore", async (req, res) => {
-    let d = saveStoreFunc(req.body)
+app.post("/applyData", async (req, res) => {
+    let u = new URL(`http://localhost${req.url}`)
+    let d: BackupDataType = {}
+    if (u.searchParams.has("store")) {
+        d = getNewBackupData({ store: req.res })
+    }
+    else if (u.searchParams.has("proxyListStore")) {
+        d = getNewBackupData({ proxyListStore: req.res })
+    }
+    let r: ApplyTomlStatusType = {
+        status: false,
+        verifyStaus: "noneErr"
+    }
     let t = backupJson2frpcToml(d) || ""
+    r.verifyStaus = verifyToml(t)
+    if (r.verifyStaus != "success") {
+        res.send(JSON.stringify(r))
+        return
+    }
+    fs.writeFileSync(configjson.backupFile, JSON.stringify(d), "utf-8")
     fs.writeFileSync(configjson.frpcTomlName, t, { encoding: "utf-8" })
-    res.send("saveStore success!!!")
+    r.status = true
+    res.send(JSON.stringify(r))
+    return
+})
+
+app.post("/verifyData", async (req, res) => {
+    let u = new URL(`http://localhost${req.url}`)
+    let d: BackupDataType = {}
+    if (u.searchParams.has("store")) {
+        d = getNewBackupData({ store: req.res })
+    }
+    else if (u.searchParams.has("proxyListStore")) {
+        d = getNewBackupData({ proxyListStore: req.res })
+    }
+    let t = backupJson2frpcToml(d) || ""
+    let verifyStaus = verifyToml(t)
+    res.send(JSON.stringify({ verifyStaus }))
     return
 })
 
@@ -217,7 +290,7 @@ app.post("/saveKeyFile", async (req, res) => {
     return
 })
 
-const saveProxyListStoreFunc = (o: any) => {
+const getNewBackupData = (o: { proxyListStore?: any, store?: any }) => {
     let d: BackupDataType = {}
     if (!fs.existsSync(configjson.backupFile)) {
         let dir = path.dirname(configjson.backupFile)
@@ -229,24 +302,14 @@ const saveProxyListStoreFunc = (o: any) => {
         let s = fs.readFileSync(configjson.backupFile, "utf-8")
         d = JSON.parse(s)
     }
-    d.proxyListStore = o
-    fs.writeFileSync(configjson.backupFile, JSON.stringify(d), "utf-8")
+    if (o.proxyListStore) {
+        d.proxyListStore = o.proxyListStore
+    }
+    if (o.store) {
+        d.store = o.store
+    }
     return d
 }
-
-app.post("/saveProxyListStore", async (req, res) => {
-    saveProxyListStoreFunc(req.body)
-    res.send("saveProxyListStore success!!!")
-    return
-})
-
-app.post("/applyProxyListStore", async (req, res) => {
-    let d = saveProxyListStoreFunc(req.body)
-    let t = backupJson2frpcToml(d) || ""
-    fs.writeFileSync(configjson.frpcTomlName, t, { encoding: "utf-8" })
-    res.send("saveProxyListStore success!!!")
-    return
-})
 
 app.get(/\/*/, async (req, res, next) => {
     let p = req.path

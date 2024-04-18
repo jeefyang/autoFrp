@@ -31,8 +31,21 @@ export type FrpStatusSendType = {
 
 export type SetFrpSendType = {
     status: boolean,
-    act:SetFrpType
+    act: SetFrpType
     frpStatus?: FrpStatusType,
     content?: string
 }
 
+export type VerifyTomlType = "success" | "fileErr" | "tomlErr" | "exeErr" | "noneErr"
+
+export type VerifyTomlStatusType = {
+    verifyStaus: VerifyTomlType
+}
+
+export type ApplyTomlStatusType = {
+    status: boolean,
+    verifyStaus: VerifyTomlType
+}
+
+
+export type SaveBackupStatusType = boolean

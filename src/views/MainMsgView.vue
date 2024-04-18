@@ -55,6 +55,22 @@ const alertFunc = (s: string, e?: MouseEvent,) => {
     })
 }
 
+const onVerify = async () => {
+    let loading = showLoadingToast({ message: "应用校验中", overlay: true, forbidClick: true, duration: 0 })
+    let res = await mainStorage.verifyDataByCloud("store")
+    loading.close()
+    if (res.verifyStaus == "success") {
+        showToast("校验成功!")
+        return
+    }
+    else if (res.verifyStaus == "tomlErr") {
+        showToast("数据转换toml后,frpc识别错误,请修正再校验")
+    }
+    else {
+        showToast("应用更新失败!!!")
+    }
+}
+
 const onApply = () => {
     showConfirmDialog({
         title: `应用更新`,
@@ -63,9 +79,9 @@ const onApply = () => {
     })
         .then(async () => {
             let loading = showLoadingToast({ message: "应用更新中", overlay: true, forbidClick: true, duration: 0 })
-            let status = await mainStorage.applyStoreByCloud()
+            let res = await mainStorage.applyDataByCloud("store")
             loading.close()
-            if (status) {
+            if (res.status) {
                 showConfirmDialog({
                     title: `更新成功`,
                     message:
@@ -75,8 +91,14 @@ const onApply = () => {
                 })
                 return
             }
-            showToast("应用更新失败!!!")
-
+            else {
+                if (res.verifyStaus == "tomlErr") {
+                    showToast("数据转换toml后,frpc识别错误,请修正再更新")
+                }
+                else {
+                    showToast("应用更新失败!!!")
+                }
+            }
         })
         .catch(() => {
             // on cancel
@@ -234,6 +256,7 @@ const onCopyKey = () => {
         </div>
         <div class="buttomDiv">
             <div class="pos">
+                <van-button class="btn" type="primary" @click="onVerify">数据校验</van-button>
                 <van-button class="btn" type="primary" @click="onApply">应用更新</van-button>
                 <van-button class="btn" type="primary" @click="onSave">保存本地</van-button>
             </div>

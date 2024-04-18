@@ -3,7 +3,7 @@ import { type StoreType } from "@/server/store.type.d"
 import { type ProxyStoreType } from "@/server/proxyStore.type.d"
 import { proxyStore } from "./proxyStore"
 import { store } from "./store"
-import type { FrpStatusSendType, SetFrpSendType, SetFrpType } from '@/server/type'
+import type { ApplyTomlStatusType, FrpStatusSendType, SaveBackupStatusType, SetFrpSendType, SetFrpType, VerifyTomlStatusType } from '@/server/type'
 
 class MainStorage {
     storeStorageKey = "store"
@@ -97,64 +97,40 @@ class MainStorage {
         return true
     }
 
-    async saveStoreByCloud() {
-        let req = await fetch("/saveStore", {
+    async saveDataByCloud(type: "store" | "proxyListStore") {
+        let req = await fetch(`/saveData?${type}`, {
             method: "post",
-            body: JSON.stringify(saveStore()),
+            body: JSON.stringify(type == "store" ? saveStore() : saveProxyStore()),
             headers: {
                 "Content-Type": "application/json"
             }
         })
-        let t = await req.text()
-        if (t.indexOf("success") != -1) {
-            return true
-        }
-        return false
+        let t: SaveBackupStatusType = await req.json()
+        return t
     }
 
-    async applyStoreByCloud() {
-        let req = await fetch("/applyStore", {
+    async applyDataByCloud(type: "store" | "proxyListStore") {
+        let req = await fetch(`/applyData?Store?${type}`, {
             method: "post",
-            body: JSON.stringify(saveStore()),
+            body: JSON.stringify(type == "store" ? saveStore() : saveProxyStore()),
             headers: {
                 "Content-Type": "application/json"
             }
         })
-        let t = await req.text()
-        if (t.indexOf("success") != -1) {
-            return true
-        }
-        return false
+        let t: ApplyTomlStatusType = await req.json()
+        return t
     }
 
-    async saveProxyStoreByCloud() {
-        let req = await fetch("/saveProxyListStore", {
+    async verifyDataByCloud(type: "store" | "proxyListStore") {
+        let req = await fetch(`/verifyData?Store?${type}`, {
             method: "post",
-            body: JSON.stringify(saveProxyStore()),
+            body: JSON.stringify(type == "store" ? saveStore() : saveProxyStore()),
             headers: {
                 "Content-Type": "application/json"
             }
         })
-        let t = await req.text()
-        if (t.indexOf("success") != -1) {
-            return true
-        }
-        return false
-    }
-
-    async applyProxyStoreByCloud() {
-        let req = await fetch("/applyProxyListStore", {
-            method: "post",
-            body: JSON.stringify(saveProxyStore()),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-        let t = await req.text()
-        if (t.indexOf("success") != -1) {
-            return true
-        }
-        return false
+        let t: VerifyTomlStatusType = await req.json()
+        return t
     }
 
     async loadCrtFileByCloud() {
