@@ -76,7 +76,8 @@ export function backupJson2frpcToml(j: BackupDataType) {
 
         if (c.type == "http" || c.type == "https") {
             if (c.subdomain) {
-                addFunc("customDomains", [`${c.subdomain}.${j.store.serverAddr}`])
+                addFunc("subdomain", c.subdomain)
+                // addFunc("customDomains", [`${c.subdomain}.${j.store.serverAddr}`])
             }
             else if (c.customDomains) {
                 addFunc('customDomains', arrFunc(c.customDomains))
