@@ -208,12 +208,14 @@ app.post("/applyData", async (req, res) => {
     r.verifyStaus = verifyToml(t)
     if (r.verifyStaus != "success") {
         res.send(JSON.stringify(r))
+        console.log(r)
         return
     }
     fs.writeFileSync(configjson.backupFile, JSON.stringify(d), "utf-8")
     fs.writeFileSync(configjson.frpcTomlName, t, { encoding: "utf-8" })
     r.status = true
     res.send(JSON.stringify(r))
+    console.log(r)
     return
 })
 
@@ -229,6 +231,7 @@ app.post("/verifyData", async (req, res) => {
     let t = backupJson2frpcToml(d) || ""
     let verifyStaus = verifyToml(t)
     res.send(JSON.stringify({ verifyStaus }))
+    console.log({ verifyStaus })
     return
 })
 

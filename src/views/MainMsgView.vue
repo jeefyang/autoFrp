@@ -59,6 +59,7 @@ const onVerify = async () => {
     let loading = showLoadingToast({ message: "应用校验中", overlay: true, forbidClick: true, duration: 0 })
     let res = await mainStorage.verifyDataByCloud("store")
     loading.close()
+    console.log(res)
     if (res.verifyStaus == "success") {
         showToast("校验成功!")
         return
@@ -81,6 +82,7 @@ const onApply = () => {
             let loading = showLoadingToast({ message: "应用更新中", overlay: true, forbidClick: true, duration: 0 })
             let res = await mainStorage.applyDataByCloud("store")
             loading.close()
+            console.log(res)
             if (res.status) {
                 showConfirmDialog({
                     title: `更新成功`,
