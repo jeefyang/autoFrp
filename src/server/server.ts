@@ -181,10 +181,10 @@ app.post("/saveData", async (req, res) => {
     let u = new URL(`http://localhost${req.url}`)
     let d: BackupDataType = {}
     if (u.searchParams.has("store")) {
-        d = getNewBackupData({ store: req.res })
+        d = getNewBackupData({ store: req.body })
     }
     else if (u.searchParams.has("proxyListStore")) {
-        d = getNewBackupData({ proxyListStore: req.res })
+        d = getNewBackupData({ proxyListStore: req.body })
     }
     fs.writeFileSync(configjson.backupFile, JSON.stringify(d), "utf-8")
     res.send(JSON.stringify({ status: true }))
@@ -195,10 +195,10 @@ app.post("/applyData", async (req, res) => {
     let u = new URL(`http://localhost${req.url}`)
     let d: BackupDataType = {}
     if (u.searchParams.has("store")) {
-        d = getNewBackupData({ store: req.res })
+        d = getNewBackupData({ store: req.body })
     }
     else if (u.searchParams.has("proxyListStore")) {
-        d = getNewBackupData({ proxyListStore: req.res })
+        d = getNewBackupData({ proxyListStore: req.body })
     }
     let r: ApplyTomlStatusType = {
         status: false,
@@ -223,10 +223,10 @@ app.post("/verifyData", async (req, res) => {
     let u = new URL(`http://localhost${req.url}`)
     let d: BackupDataType = {}
     if (u.searchParams.has("store")) {
-        d = getNewBackupData({ store: req.res })
+        d = getNewBackupData({ store: req.body })
     }
     else if (u.searchParams.has("proxyListStore")) {
-        d = getNewBackupData({ proxyListStore: req.res })
+        d = getNewBackupData({ proxyListStore: req.body })
     }
     let t = backupJson2frpcToml(d) || ""
     let verifyStaus = verifyToml(t)

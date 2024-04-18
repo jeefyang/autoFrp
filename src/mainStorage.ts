@@ -110,7 +110,7 @@ class MainStorage {
     }
 
     async applyDataByCloud(type: "store" | "proxyListStore") {
-        let req = await fetch(`/applyData?Store?${type}`, {
+        let req = await fetch(`/applyData?${type}`, {
             method: "post",
             body: JSON.stringify(type == "store" ? saveStore() : saveProxyStore()),
             headers: {
@@ -122,7 +122,7 @@ class MainStorage {
     }
 
     async verifyDataByCloud(type: "store" | "proxyListStore") {
-        let req = await fetch(`/verifyData?Store?${type}`, {
+        let req = await fetch(`/verifyData?${type}`, {
             method: "post",
             body: JSON.stringify(type == "store" ? saveStore() : saveProxyStore()),
             headers: {
