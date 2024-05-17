@@ -164,7 +164,22 @@ const onJumpLocal = (i: number) => {
     })
         .then(() => {
             try {
-                window.open(url)
+                if (c.type == "https") {
+                    if (c.pluginType == "none") {
+                        url = c.type + '://' + url
+                    }
+                    else if (c.pluginType == "https2http") {
+                        url = 'http://' + url
+                    }
+                    else if (c.pluginType == "https2https") {
+                        url = 'https://' + url
+                    }
+                }
+                else {
+                    url = c.type + '://' + url
+                }
+
+                window.open(url, "_blank")
             }
             catch {
                 showFailToast({ message: `无法跳转到 ${url}` })
