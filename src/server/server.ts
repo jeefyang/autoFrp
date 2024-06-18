@@ -240,7 +240,7 @@ app.post('/loadCrtFile', async (req, res) => {
     if (req.body && req.body.url) {
         url = req.body.url
     }
-    url = path.isAbsolute(url) ? url : path.join('./frp', url)
+    url = path.isAbsolute(url) ? url : path.join(frpDir, url)
     if (!fs.existsSync(url)) {
         res.send("")
         return
@@ -252,7 +252,7 @@ app.post('/loadCrtFile', async (req, res) => {
 
 app.post("/saveCrtFile", async (req, res) => {
     let url = req?.body?.url || configjson.crtUrl
-    url = path.isAbsolute(url) ? url : path.join('./frp', url)
+    url = path.isAbsolute(url) ? url : path.join(frpDir, url)
     if (!fs.existsSync(url)) {
         let dir = path.dirname(url)
         if (!fs.existsSync(dir)) {
@@ -269,7 +269,7 @@ app.post('/loadKeyFile', async (req, res) => {
     if (req.body && req.body.url) {
         url = req.body.url
     }
-    url = path.isAbsolute(url) ? url : path.join('./frp', url)
+    url = path.isAbsolute(url) ? url : path.join(frpDir, url)
     if (!fs.existsSync(url)) {
         res.send("")
         return
@@ -281,7 +281,7 @@ app.post('/loadKeyFile', async (req, res) => {
 
 app.post("/saveKeyFile", async (req, res) => {
     let url = req?.body?.url || configjson.keyUrl
-    url = path.isAbsolute(url) ? url : path.join('./frp', url)
+    url = path.isAbsolute(url) ? url : path.join(frpDir, url)
     if (!fs.existsSync(url)) {
         let dir = path.dirname(url)
         if (!fs.existsSync(dir)) {
