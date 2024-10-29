@@ -7,8 +7,11 @@ import { onMounted, watch } from "vue"
 import { otherStore } from "@/otherStore"
 import type { FrpStatusType, SetFrpType } from "@/server/type.d";
 import { domAction } from "@/domAction";
+import { proxyStore } from "@/proxyStore";
 
 const frpStatus = ref(<"null" | "online" | "offline">"null")
+const originIP = ref(<string>"")
+const replaceIP = ref(<string>"")
 
 onMounted(() => {
 
@@ -72,7 +75,6 @@ const onProxyStorageCloud = async () => {
 }
 
 const getTime = (t: number) => {
-    console.log(t)
     let date = new Date(t)
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -84,13 +86,44 @@ const getTime = (t: number) => {
     return formattedDate
 }
 
+const onReplaceIP = async () => {
+    for (let i = 0; i < proxyStore.length; i++) {
+        let c = proxyStore[i]
+        if (c.localIP != originIP.value) {
+            continue
+        }
+        c.localIP = replaceIP.value
+    }
+    await showConfirmDialog({
+        title: "保存到本地",
+        message: "需要保存到本地吗?"
+    }).then(async () => {
+        mainStorage.saveProxyStoreByLocalStorage()
+    }).catch(() => {
+
+    })
+    await showConfirmDialog({
+        title: "应用更新",
+        message: "需要将数据应用到服务器?"
+    }).then(async () => {
+        let res = await mainStorage.applyDataByCloud("proxyListStore")
+        if (res.status) {
+            showToast("数据更新成功!")
+        }
+    }).catch(() => {
+
+    })
+}
+
+
+
 </script>
 <template>
 
     <div class="big">
         <div class="display">
             <van-cell-group inset>
-                状态:    {{ getTime(otherStore.backupFileTime) }}
+                状态: {{ getTime(otherStore.backupFileTime) }}
                 <div class="frpstatus">
                     <div>{{ frpStatus }}</div>
                     <div>
@@ -107,19 +140,24 @@ const getTime = (t: number) => {
                     <van-button class="btn" type="primary" :disabled="frpStatus == 'null'"
                         @click="onSetFrp('delete')">删除</van-button>
                 </div>
-                主配置:    {{ getTime(otherStore.storeTime) }}
+                主配置: {{ getTime(otherStore.storeTime) }}
                 <div>
                     <van-button class="btn" type="primary" @click="onStoreReset">重置当前</van-button>
                     <van-button class="btn" type="primary" @click="onStoreCloud">读取云端</van-button>
                     <van-button class="btn" type="primary" @click="onStoreClear">清空本地</van-button>
 
                 </div>
-                代理配置:   {{ getTime(otherStore.proxyStoreTime) }}
+                代理配置: {{ getTime(otherStore.proxyStoreTime) }}
                 <div>
                     <van-button class="btn" type="primary" @click="onProxyStoreReset">重置当前</van-button>
                     <van-button class="btn" type="primary" @click="onProxyStorageCloud">读取云端</van-button>
                     <van-button class="btn" type="primary" @click="onProxyStorageClear">清空本地</van-button>
-
+                </div>
+                代理ip批量切换:
+                <div>
+                    <van-field v-model="originIP" label="源ip" placeholder="请输入ip"></van-field>
+                    <van-field v-model="replaceIP" label="改ip" placeholder="请输入ip"></van-field>
+                    <van-button class="btn" type="primary" @click="onReplaceIP">切换</van-button>
                 </div>
             </van-cell-group>
         </div>
