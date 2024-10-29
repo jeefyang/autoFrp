@@ -9,6 +9,7 @@ import { showToast, showConfirmDialog, showLoadingToast, showFailToast } from "v
 import { store } from "@/store";
 import { otherStore } from "@/otherStore";
 import qrcode from "qrcode"
+import { domAction } from "@/domAction";
 
 
 const showEdit = ref(false)
@@ -210,8 +211,7 @@ const onResetChild = () => {
 }
 
 const onSave = () => {
-    mainStorage.saveProxyStoreByLocalStorage()
-    showToast("已经保存到localstorage")
+    domAction.saveProxyStoreByLocalStorage()
 }
 
 const onVerify = async () => {

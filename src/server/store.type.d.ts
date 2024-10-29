@@ -44,11 +44,14 @@ export type StoreType = {
     /** HTTP 类型代理监听的端口，启用后才能支持 HTTP 类型的代理 */
     vhostHTTPPort: number
     /** crt证书内容 */
-    crtContent:string
+    crtContent: string
     /** crt证书路径,初始化会首先去读取配置文件的路径 */
-    crtUrl:string
+    crtUrl: string
     /** key密钥内容 */
-    keyContent:string
+    keyContent: string
     /** key密钥路径,初始化会首先去读取配置文件的路径 */
-    keyUrl:string
+    keyUrl: string
+
+    /** 是否自动启动 */
+    autoRun: boolean
 }

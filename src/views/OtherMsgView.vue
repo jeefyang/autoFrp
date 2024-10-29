@@ -6,6 +6,7 @@ import { mainStorage } from "@/mainStorage"
 import { onMounted, watch } from "vue"
 import { otherStore } from "@/otherStore"
 import type { FrpStatusType, SetFrpType } from "@/server/type.d";
+import { domAction } from "@/domAction";
 
 const frpStatus = ref(<"null" | "online" | "offline">"null")
 
@@ -51,13 +52,7 @@ const onStoreClear = () => {
 }
 
 const onStoreCloud = async () => {
-    let status = await mainStorage.loadStoreByCloud()
-    if (status) {
-        showToast("已经从云端读取了主配置信息")
-    }
-    else {
-        showToast("无法从云端读取主配置信息")
-    }
+    await domAction.loadStoreByCloud()
 }
 
 const onProxyStoreReset = () => {
@@ -72,13 +67,7 @@ const onProxyStorageClear = () => {
 }
 
 const onProxyStorageCloud = async () => {
-    let status = await mainStorage.loadPorxyStoreByCloud()
-    if (status) {
-        showToast("已经从云端读取了代理列表")
-    }
-    else {
-        showToast("无法从云端读取代理列表")
-    }
+    await domAction.loadPorxyStoreByCloud()
 }
 
 </script>

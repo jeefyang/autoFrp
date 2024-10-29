@@ -7,6 +7,8 @@ import { proxyStore } from './proxyStore';
 import { otherStore } from "./otherStore"
 import { store } from './store';
 import { type ConfigType } from "@/server/type.d"
+import { showToast, showConfirmDialog, showLoadingToast, showFailToast } from "vant";
+import { domAction } from './domAction';
 
 const active = ref(0)
 
@@ -32,7 +34,52 @@ onMounted(async () => {
     mainStorage.loadProxyStoreByLocalStorage()
   }
 
+
   otherStore.numUpdate++
+
+  let s = await mainStorage.getFrpBackFileDate()
+  let t = Number(s || 0)
+
+  let storeTime = mainStorage.loadModifyStoreTimeByLocalStorage()
+
+  let proxyStoreTime = mainStorage.loadModifyProxyStoreTimeByLocalStorage()
+
+  let limitTime = config.updatelimitTime || (1000 * 60 * 60 * 24 * 30)
+  // 时间间隔大于更新时间
+  if (t - storeTime > limitTime) {
+    await showConfirmDialog({
+      title: `读取云端主信息`,
+      message:
+        '当前主信息已经有点旧了,需要更新吗',
+    })
+      .then(async () => {
+        let s = await domAction.loadStoreByCloud()
+        if (s) {
+          domAction.saveStoreByLocalSotre()
+        }
+      })
+      .catch(() => {
+        // on cancel
+      });
+  }
+
+  // 时间间隔大于更新时间
+  if (t - proxyStoreTime > limitTime) {
+    await showConfirmDialog({
+      title: `读取云端代理信息`,
+      message:
+        '当前代理信息已经有点旧了,需要更新吗',
+    })
+      .then(async () => {
+        let s = await domAction.loadPorxyStoreByCloud()
+        if (s) {
+          domAction.saveProxyStoreByLocalStorage()
+        }
+      })
+      .catch(() => {
+        // on cancel
+      });
+  }
 })
 
 const onUpdateListView = () => {

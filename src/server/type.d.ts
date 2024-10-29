@@ -14,6 +14,8 @@ export type ConfigType = {
     frpcPM2Name: string
     /** frpc的toml文件 */
     frpcTomlName: string
+    /** 触发更新最大更新时间 */
+    updatelimitTime?:number
 }
 
 export type BackupDataType = {

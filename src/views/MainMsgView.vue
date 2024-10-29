@@ -9,6 +9,7 @@ import EasySwitch from "@/components/EasySwitch.vue"
 import EasyNum from "@/components/EasyNum.vue"
 import { mainStorage } from "@/mainStorage";
 import { copyStr } from "@/tool";
+import { domAction } from "@/domAction";
 
 const desc = {
     serverAddr: "ServerAddr 指定要连接到的服务器的地址。",
@@ -32,6 +33,7 @@ const desc = {
     keyContent: "key密钥内容,保存更新将覆写文件",
     keyUrl: "key密钥路径,将用于内容写入文件里,且代理时默认同步key密钥路径,指的当前客户端所在服务器的路径且位置相对于frpc程序,如不清楚客户端所在服务器的路径,请不要乱修改",
 
+    autoRun:"pm2服务器是否自动启动,防止服务崩溃重启没有启动导致无法代理",
 }
 
 
@@ -108,8 +110,7 @@ const onApply = () => {
 }
 
 const onSave = () => {
-    mainStorage.saveStoreByLocalStorage()
-    showToast("已经保存到localstorage")
+    domAction.saveStoreByLocalSotre()
 }
 
 const onLoadCrtFile = async () => {
@@ -182,6 +183,10 @@ const onCopyKey = () => {
         <div class="content">
             <div class="display">
                 <van-cell-group inset>
+                    <EasySwitch @labelclick="alertFunc(desc.autoRun)" v-model="store.autoRun"
+                        :inactive-color="inactiveColor" :active-color="activeColor" label="frp服务器是否自动启动:">
+                    </EasySwitch>
+
                     <van-field autosize type="textarea" @click="alertFunc(desc.serverAddr, $event)" rows="1"
                         v-model="store.serverAddr" label="服务器地址:" placeholder="请输入服务器地址" />
 

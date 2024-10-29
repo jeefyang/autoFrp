@@ -9,10 +9,29 @@ class MainStorage {
     storeStorageKey = "store"
     originStoreData!: StoreType
     proxyStoreStorageKey = "proxyStore"
+    modifyStoreTimeStorageKey = "modifyStoreTime"
+    modifyProxyStoreTimeStorageKey = 'modifyProxyStoreTime'
 
     backupStore() {
         this.originStoreData = saveStore()
     }
+
+    loadModifyStoreTimeByLocalStorage() {
+        return Number(localStorage.getItem(this.modifyStoreTimeStorageKey) || 0)
+    }
+
+    loadModifyProxyStoreTimeByLocalStorage() {
+        return Number(localStorage.getItem(this.modifyProxyStoreTimeStorageKey) || 0)
+    }
+
+    saveModifyStoreTimeByLocalStorage(t?: string) {
+        localStorage.setItem(this.modifyStoreTimeStorageKey, t || (new Date().getTime().toString()))
+    }
+
+    saveModifyProxyStoreTimeByLocalStorage(t?: string) {
+        localStorage.setItem(this.modifyProxyStoreTimeStorageKey, t || (new Date().getTime().toString()))
+    }
+
 
     saveStoreByLocalStorage() {
         localStorage.setItem(this.storeStorageKey, JSON.stringify(saveStore()))
@@ -20,6 +39,7 @@ class MainStorage {
 
     saveProxyStoreByLocalStorage() {
         localStorage.setItem(this.proxyStoreStorageKey, JSON.stringify(saveProxyStore()))
+
     }
 
     isStoreBeginlocalStorage() {
@@ -193,6 +213,11 @@ class MainStorage {
             return true
         }
         return false
+    }
+
+    async getFrpBackFileDate() {
+        let s = await fetch('/backupFileDate')
+        return s.text()
     }
 
     async getFrpStatusByCloud() {

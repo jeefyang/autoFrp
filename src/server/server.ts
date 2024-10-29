@@ -5,7 +5,6 @@ import fs, { stat } from "fs"
 import path from "path"
 import bodyparser from "body-parser"
 import type { ConfigType, BackupDataType, FrpStatusType, SetFrpType, FrpStatusSendType, SetFrpSendType, VerifyTomlType, ApplyTomlStatusType } from "./type.d"
-import { execSync } from "child_process"
 import shell from "shelljs"
 import { backupJson2frpcToml } from "./json2toml"
 
@@ -61,6 +60,7 @@ const getFrpStatus = () => {
     return status
 }
 
+/** 验证toml文件 */
 const verifyToml = (s: string) => {
     let status: VerifyTomlType = "noneErr"
     if (!s) {
@@ -89,12 +89,15 @@ const verifyToml = (s: string) => {
 
 }
 
+/** 获取frp状态 */
 app.get("/frpStatus", async (req, res) => {
     let status = getFrpStatus()
     let j: FrpStatusSendType = { status }
     res.send(JSON.stringify(j))
 })
 
+
+/** 设置frp状态 */
 app.get("/setFrp", async (req, res) => {
     let u = new URL(`http://localhost${req.url}`)
     let list: SetFrpType[] = ['start', "restart", "stop", "delete"]
@@ -118,9 +121,21 @@ app.get("/setFrp", async (req, res) => {
     return
 })
 
-
+/** 获取配置文件数据 */
 app.get("/config", async (req, res) => {
     res.send(JSON.stringify(configjson))
+})
+
+
+/** 获取备份文件最后修改时间数据 */
+app.get('/backupFileDate', async (req, res) => {
+    if (!fs.existsSync(configjson.backupFile)) {
+        res.send(0)
+        return
+    }
+    let stats = fs.statSync(configjson.backupFile)
+    res.send(stats.ctimeMs)
+    return
 })
 
 app.get("/store", async (req, res) => {
@@ -142,6 +157,7 @@ app.get("/store", async (req, res) => {
     return
 })
 
+/** 获取代理列表 */
 app.get("/proxyListStore", async (req, res) => {
     if (!fs.existsSync(configjson.backupFile)) {
         res.send("")
@@ -160,6 +176,7 @@ app.get("/proxyListStore", async (req, res) => {
     res.send(JSON.stringify(j.proxyListStore))
 })
 
+/** 保存数据 */
 const saveStoreFunc = (o: any) => {
     let d: BackupDataType = {}
     if (!fs.existsSync(configjson.backupFile)) {
@@ -177,6 +194,7 @@ const saveStoreFunc = (o: any) => {
     return d
 }
 
+/** 保存数据 */
 app.post("/saveData", async (req, res) => {
     let u = new URL(`http://localhost${req.url}`)
     let d: BackupDataType = {}
@@ -191,6 +209,7 @@ app.post("/saveData", async (req, res) => {
     return
 })
 
+/** 应用数据 */
 app.post("/applyData", async (req, res) => {
     let u = new URL(`http://localhost${req.url}`)
     let d: BackupDataType = {}
@@ -363,5 +382,42 @@ else {
 
 }
 
-app.listen(configjson.listen)
+app.listen(configjson.listen);
+
+// 额外操作
+// (() => {
+
+//     if (!fs.existsSync(configjson?.backupFile)) {
+//         return
+//     }
+//     if(!fs.existsSync(configjson.frpcTomlName)){
+//         return
+//     }
+//     let s = fs.readFileSync(configjson.backupFile, "utf-8")
+//     if (!s) {
+//         return
+//     }
+//     try {
+//         let j: BackupDataType = JSON.parse(s)
+//         if (!j.store) {
+//             return
+//         }
+//         if (j.store.autoRun) {
+//             console.log("识别出frp需要自动唤醒")
+//             let s=fs.readFileSync(configjson.frpcTomlName,'utf-8')
+//             if(verifyToml(s)!=='success'){
+//                 console.log("toml文件验证不通过!")
+//                 return
+//             }
+
+//         }
+//     }
+//     catch {
+
+//     }
+
+// })()
+
+
+
 console.log(`监听启动:${configjson.listen}`)
