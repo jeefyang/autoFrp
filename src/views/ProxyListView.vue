@@ -243,6 +243,8 @@ const onApplyUpdate = async () => {
             loading.close()
             console.log(res)
             if (res.status) {
+                let s = new Date().getTime()
+                otherStore.backupFileTime = s
                 showConfirmDialog({
                     title: `更新成功`,
                     message:

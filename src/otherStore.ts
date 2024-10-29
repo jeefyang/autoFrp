@@ -6,4 +6,8 @@ export const otherStore = reactive(<OtherStoreType>{
     loadingMsg: "",
     otherUpdate: 0,
     numUpdate: 0,
+
+    backupFileTime: 0,
+    storeTime: 0,
+    proxyStoreTime: 0
 })

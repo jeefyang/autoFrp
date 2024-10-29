@@ -48,6 +48,7 @@ const onStoreReset = () => {
 
 const onStoreClear = () => {
     mainStorage.clearStoreByLocalStorage()
+    mainStorage.saveModifyStoreTimeByLocalStorage('0')
     showToast("已经清空localstorage的主配置信息")
 }
 
@@ -62,12 +63,25 @@ const onProxyStoreReset = () => {
 
 const onProxyStorageClear = () => {
     mainStorage.clearProxyStoreByLocalStorage()
-    showConfirmDialog({ title: "是否刷新?" })
+    mainStorage.saveModifyProxyStoreTimeByLocalStorage('0')
     showToast("已经清空localstorage的代理列表")
 }
 
 const onProxyStorageCloud = async () => {
     await domAction.loadPorxyStoreByCloud()
+}
+
+const getTime = (t: number) => {
+    console.log(t)
+    let date = new Date(t)
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hour = date.getHours().toString().padStart(2, '0');
+    const minute = date.getMinutes().toString().padStart(2, '0');
+    const second = date.getSeconds().toString().padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+    return formattedDate
 }
 
 </script>
@@ -76,7 +90,7 @@ const onProxyStorageCloud = async () => {
     <div class="big">
         <div class="display">
             <van-cell-group inset>
-                状态:
+                状态:    {{ getTime(otherStore.backupFileTime) }}
                 <div class="frpstatus">
                     <div>{{ frpStatus }}</div>
                     <div>
@@ -93,17 +107,19 @@ const onProxyStorageCloud = async () => {
                     <van-button class="btn" type="primary" :disabled="frpStatus == 'null'"
                         @click="onSetFrp('delete')">删除</van-button>
                 </div>
-                主配置:
+                主配置:    {{ getTime(otherStore.storeTime) }}
                 <div>
                     <van-button class="btn" type="primary" @click="onStoreReset">重置当前</van-button>
                     <van-button class="btn" type="primary" @click="onStoreCloud">读取云端</van-button>
                     <van-button class="btn" type="primary" @click="onStoreClear">清空本地</van-button>
+
                 </div>
-                代理配置:
+                代理配置:   {{ getTime(otherStore.proxyStoreTime) }}
                 <div>
                     <van-button class="btn" type="primary" @click="onProxyStoreReset">重置当前</van-button>
                     <van-button class="btn" type="primary" @click="onProxyStorageCloud">读取云端</van-button>
                     <van-button class="btn" type="primary" @click="onProxyStorageClear">清空本地</van-button>
+
                 </div>
             </van-cell-group>
         </div>

@@ -3,4 +3,7 @@ export type OtherStoreType = {
     otherUpdate: number,
     numUpdate: number,
     loadingMsg: string
+    storeTime: number
+    proxyStoreTime: number
+    backupFileTime: number
 }

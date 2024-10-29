@@ -44,6 +44,10 @@ onMounted(async () => {
 
   let proxyStoreTime = mainStorage.loadModifyProxyStoreTimeByLocalStorage()
 
+  otherStore.backupFileTime = t
+  otherStore.storeTime = storeTime
+  otherStore.proxyStoreTime = proxyStoreTime
+
   let limitTime = config.updatelimitTime || (1000 * 60 * 60 * 24 * 30)
   // 时间间隔大于更新时间
   if (t - storeTime > limitTime) {

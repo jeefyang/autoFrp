@@ -4,6 +4,7 @@ import { type ProxyStoreType } from "@/server/proxyStore.type.d"
 import { proxyStore } from "./proxyStore"
 import { store } from "./store"
 import type { ApplyTomlStatusType, FrpStatusSendType, SaveBackupStatusType, SetFrpSendType, SetFrpType, VerifyTomlStatusType } from '@/server/type'
+import { otherStore } from "./otherStore"
 
 class MainStorage {
     storeStorageKey = "store"
@@ -25,11 +26,15 @@ class MainStorage {
     }
 
     saveModifyStoreTimeByLocalStorage(t?: string) {
-        localStorage.setItem(this.modifyStoreTimeStorageKey, t || (new Date().getTime().toString()))
+        let s = t || (new Date().getTime().toString())
+        localStorage.setItem(this.modifyStoreTimeStorageKey, s)
+        otherStore.storeTime = Number(s)
     }
 
     saveModifyProxyStoreTimeByLocalStorage(t?: string) {
-        localStorage.setItem(this.modifyProxyStoreTimeStorageKey, t || (new Date().getTime().toString()))
+        let s = t || (new Date().getTime().toString())
+        localStorage.setItem(this.modifyProxyStoreTimeStorageKey, s)
+        otherStore.proxyStoreTime = Number(s)
     }
 
 
